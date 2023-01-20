@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 BASE_COLLECTION_PATH="/must-gather"
 
 GITOPS_COLLECTION_PATH="$BASE_COLLECTION_PATH/cluster-gitops"
@@ -16,7 +16,7 @@ exit_if_binary_not_installed() {
 
 # Checks if the cluster is an OpenShift cluster, if not logs an error
 exit_if_not_openshift() {
-  if ! oc version ; then
+  if ! oc get clusterversion ; then
     echo "Error: The current cluster is not an OpenShift cluster. Aborting must-gather..." >> "${GITOPS_DIR}"/must-gather-script-errors.txt 2>&1
     exit 1
   fi
@@ -58,8 +58,8 @@ function main() {
   echo "Starting GitOps Operator must-gather script..."
   mkdir -p "$GITOPS_DIR"
 
-  exit_if_not_openshift
   exit_if_binary_not_installed "kubectl" "oc"
+  exit_if_not_openshift
   getNamespaces
 
   echo "getting OpenShift Cluster Version..."
@@ -195,4 +195,4 @@ function main() {
   echo "Done! Thank you for using the GitOps must-gather tool :)"
 }
 
-# main "$@"
+main "$@"
