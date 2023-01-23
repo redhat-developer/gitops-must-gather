@@ -46,10 +46,8 @@ run_and_log() {
     echo "  - Running: $command"
     # Execute the command and redirect stdout and stderr to files
     if ! $command >"$output_file" 2>"$error_file"; then
-        exit_status=$?
         echo "   -> Command failed, retrying..."
         if ! $command >"$output_file" 2>"$error_file"; then
-            exit_status=$?
             echo "   -> Command failed again, saving error message to ${ERROR_LOG}"
             # If the error file is empty, log a message to the error file to indicate that there was no output
             # Otherwise, log the contents of the error file
@@ -72,6 +70,7 @@ run_and_log() {
             # Remove the temporary error file, although it will be overwritten on the next run
             # We don't want to leave it around in case the script fails, as it will contain the error message from the last run
             rm "$error_file" || echo "Failed to remove temporary error file: '$error_file'"
+            exit_status=1 # Set the exit status to 1 to indicate that the command failed
         fi
     else
         # If the command succeeded, see if the output file is empty
@@ -84,6 +83,7 @@ run_and_log() {
             NO_OUTPUT_COUNTER=$((NO_OUTPUT_COUNTER + 1))
         else
             echo "   -> Command executed successfully, output saved to $output_file"
+            exit_status=0 # Set the exit status to 0 to indicate that the command succeeded
         fi
     fi
 
