@@ -16,7 +16,7 @@ You will get a dump of:
 - The GitOps Operator namespace (and its children objects)
 - All namespaces where ArgoCD objects exist in, plus all objects in those namespaces, such as ArgoCD, Applications, ApplicationSets, and AppProjects, and configmaps
   - No secrets will be collected
-- A list of list of the namespaces that are managed by gitops-operator identified namespaces and resources from those namespaces.
+- A list of lists of the namespaces that are managed by gitops-operator identified namespaces and resources from those namespaces.
 - All GitOps CRD's objects and definitions
 - Operator logs
 - Logs of Argo CD
@@ -28,7 +28,7 @@ In addition to that, we will get a summary of:
 - Errors: `must-gather-script-errors.txt`
 - Commands that produced no output: `must-gather-script-no-output.txt`
 
-All the output of the commands is stored into 3 different format:
+All the output of the commands is stored into 3 different formats:
 
 - `*.txt` that represents the normal view without any structure.
 - `*.yaml` that is the YAML output of the command.
@@ -102,7 +102,7 @@ cluster-gitops
 ## Testing
 
 You can run the script locally from your workstation.
-To do that you need an OpenShift cluster and you will have to install the RedHat GitOps Operator.
+To do that you need an OpenShift cluster and you will have to install the Red Hat GitOps Operator.
 Then you can run the script like this:
 
 ```shell
@@ -113,4 +113,4 @@ chmod +x ./gather_gitops.sh
 Last but not least, please make sure you run `make lint` before pushing new changes.
 This requires `shellcheck` to be installed in your machine.
 
-For more information about `buildind` and `pushing` the image, see `make help`.
+For more information about `building` and `pushing` the image, see `make help`.
