@@ -307,7 +307,7 @@ function main() {
     managedNamespaces=$(oc get namespaces --selector=argocd.argoproj.io/managed-by="${namespace}" -o jsonpath='{.items[*].metadata.name}')
 
     for managedNamespace in ${managedNamespaces}; do
-      MANAGED_RESOURCES_DIR="${GITOPS_DIR}/managedNamespace_${managedNamespace}/resources"
+      MANAGED_RESOURCES_DIR="${RESOURCES_DIR}/managedNamespace_${managedNamespace}"
       create_directory "${MANAGED_RESOURCES_DIR}"
 
       echo " * Getting Pods for ArgoCD Managed namespace ${managedNamespace}..."
@@ -369,25 +369,15 @@ function main() {
         run_and_log "oc -n ${managedNamespace} get statefulset/${statefulset} -o yaml" "${MANAGED_RESOURCES_STATEFULSETS_DIR}/${statefulset}.yaml"
         run_and_log "oc -n ${managedNamespace} get statefulset/${statefulset} -o json" "${MANAGED_RESOURCES_STATEFULSETS_DIR}/${statefulset}.json"
       done
-
-      echo " * Getting Routs for ArgoCD Managed namespace ${managedNamespace}..."
-      MANAGED_RESOURCES_ROUTES_DIR="${MANAGED_RESOURCES_DIR}/routes"
-      create_directory "${MANAGED_RESOURCES_ROUTES_DIR}"
-      run_and_log "oc get routes -n ${managedNamespace}" "${MANAGED_RESOURCES_ROUTES_DIR}/routes.txt"
-      for route in $(oc get routes -n "${managedNamespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-        run_and_log "oc -n ${managedNamespace} get route/${route}" "${MANAGED_RESOURCES_ROUTES_DIR}/${route}.txt"
-        run_and_log "oc -n ${managedNamespace} get route/${route} -o yaml" "${MANAGED_RESOURCES_ROUTES_DIR}/${route}.yaml"
-        run_and_log "oc -n ${managedNamespace} get route/${route} -o json" "${MANAGED_RESOURCES_ROUTES_DIR}/${route}.json"
-      done
     done
   done
 
   echo " * Getting ArgoCD AppProjects from all Namespaces..."
   APPPROJECT_DIR="${ARGOCD_DIR}/appprojects"
   create_directory "${APPPROJECT_DIR}"
-  run_and_log "oc get appProjects.argoproj.io --all-namespaces" "${ARGOCD_DIR}/appprojects.txt"
-  run_and_log "oc get appProjects.argoproj.io --all-namespaces -o yaml" "${ARGOCD_DIR}/appprojects.yaml"
-  run_and_log "oc get appProjects.argoproj.io --all-namespaces -o json" "${ARGOCD_DIR}/appprojects.json"
+  run_and_log "oc get appProjects.argoproj.io --all-namespaces" "${APPPROJECT_DIR}/appprojects.txt"
+  run_and_log "oc get appProjects.argoproj.io --all-namespaces -o yaml" "${APPPROJECT_DIR}/appprojects.yaml"
+  run_and_log "oc get appProjects.argoproj.io --all-namespaces -o json" "${APPPROJECT_DIR}/appprojects.json"
 
   echo " * Getting GitOps CRDs from all Namespaces..."
   CRD_DIR="${GITOPS_DIR}/crds"
