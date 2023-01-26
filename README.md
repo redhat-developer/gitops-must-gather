@@ -16,7 +16,7 @@ You will get a dump of:
 - The GitOps Operator namespace (and its children objects)
 - All namespaces where ArgoCD objects exist in, plus all objects in those namespaces, such as ArgoCD, Applications, ApplicationSets, and AppProjects, and configmaps
   - No secrets will be collected
-- A list of lists of the namespaces that are managed by gitops-operator identified namespaces and resources from those namespaces.
+- A list of the namespaces that are managed by gitops-operator identified namespaces and resources from those namespaces.
 - All GitOps CRD's objects and definitions
 - Operator logs
 - Logs of Argo CD
