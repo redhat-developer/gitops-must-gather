@@ -180,6 +180,7 @@ cluster-gitops
         ├── must-gather-script-no-output.txt
         └── must-gather-script-errors.txt
 ```
+Note: most of the resource outputs are given in 3 file types: `.json`, `.yaml`, and `.txt`, however those files are combined in this tree for clarity and conciseness. 
 
 ## Testing
 
