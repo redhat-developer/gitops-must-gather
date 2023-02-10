@@ -118,7 +118,7 @@ function getNamespaces() {
   clusterScopedInstances=$(oc get subs openshift-gitops-operator -n openshift-operators -o json | jq '.spec.config.env[]?|select(.name=="ARGOCD_CLUSTER_CONFIG_NAMESPACES").value' | tr -d '",')
   disableDefaultArgoCDInstanceValue=$(oc get subs openshift-gitops-operator -n openshift-operators -o json | jq '.spec.config.env[]?|select(.name=="DISABLE_DEFAULT_ARGOCD_INSTANCE").value')
   if [[ "$(oc get subs openshift-gitops-operator -n openshift-operators -o jsonpath='{.spec.config.env}')" == "" ]]; then
-    namespaces=${default}
+    namespaces="${default}"
   elif [[ "${clusterScopedInstances}" != "" ]]; then
     if [[ "${disableDefaultArgoCDInstanceValue}" == "true" ]]; then
       namespaces+="${clusterScopedInstances}"
@@ -139,6 +139,116 @@ function getNamespaces() {
   
   NAMESPACES=$(echo "${total}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
   export NAMESPACES
+}
+
+# gets pods; takes namespace and directory as argument
+get_pods() {
+  echo " * Getting pods in $1..."
+  run_and_log "oc get pods -n $1" "$2/pods.txt"
+  for pod in $(oc get pods -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get pod/${pod}" "$2/${pod}.txt"
+    run_and_log "oc -n $1 get pod/${pod} -o yaml" "$2/${pod}.yaml"
+    run_and_log "oc -n $1 get pod/${pod} -o json" "$2/${pod}.json"
+    run_and_log "oc -n $1 logs pod/${pod}" "$2/${pod}-logs.txt"
+  done
+}
+
+# gets deployments; takes namespace and directory as argument
+get_deployments(){
+  echo " * Getting deployments in $1..."
+  run_and_log "oc get deployments -n $1" "$2/deployments.txt"
+  for deployment in $(oc get deployments -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get deployment/${deployment}" "$2/${deployment}.txt"
+    run_and_log "oc -n $1 get deployment/${deployment} -o yaml" "$2/${deployment}.yaml"
+    run_and_log "oc -n $1 get deployment/${deployment} -o json" "$2/${deployment}.json"
+  done
+}
+
+# gets services; takes namespace and directory as argument
+get_services(){
+  echo " * Getting services in $1..."
+  run_and_log "oc get services -n $1" "$2/services.txt"
+  for service in $(oc get services -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get service/${service}" "$2/${service}.txt"
+    run_and_log "oc -n $1 get service/${service} -o yaml" "$2/${service}.yaml"
+    run_and_log "oc -n $1 get service/${service} -o json" "$2/${service}.json"
+  done
+}
+
+# gets replicasets; takes namespace and directory as argument
+get_replicaSets(){
+  echo " * Getting replicaSets in $1..."
+  run_and_log "oc get replicasets -n $1" "$2/replicaSets.txt"
+  for replicaset in $(oc get replicasets -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get replicaset/${replicaset}" "$2/${replicaset}.txt"
+    run_and_log "oc -n $1 get replicaset/${replicaset} -o yaml" "$2/${replicaset}.yaml"
+    run_and_log "oc -n $1 get replicaset/${replicaset} -o json" "$2/${replicaset}.json"
+  done
+}
+
+# gets statefulsets; takes namespace and directory as argument
+get_statefulSets(){
+  echo " * Getting statefulsets in $1..."
+  run_and_log "oc get statefulsets -n $1" "$2/statefulsets.txt"
+  for statefulset in $(oc get statefulsets -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get statefulset/${statefulset}" "$2/${statefulset}.txt"
+    run_and_log "oc -n $1 get statefulset/${statefulset} -o yaml" "$2/${statefulset}.yaml"
+    run_and_log "oc -n $1 get statefulset/${statefulset} -o json" "$2/${statefulset}.json"
+  done
+}
+
+# gets routes; takes namespace and directory as argument
+get_routes(){
+  echo " * Getting routes in $1..."
+  run_and_log "oc get routes -n $1" "$2/routes.txt"
+  for route in $(oc get routes -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get route/${route}" "$2/${route}.txt"
+    run_and_log "oc -n $1 get route/${route} -o yaml" "$2/${route}.yaml"
+    run_and_log "oc -n $1 get route/${route} -o json" "$2/${route}.json"
+  done
+}
+
+# gets argocd instances; takes namespace and directory as argument
+get_argocds(){
+  echo " * Getting ArgoCD in $1..."
+  run_and_log "oc get argocd -n $1" "$2/argocd.txt"
+  for argocd in $(oc get argocd -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get argocd/${argocd}" "$2/${argocd}.txt"
+    run_and_log "oc -n $1 get argocd/${argocd} -o yaml" "$2/${argocd}.yaml"
+    run_and_log "oc -n $1 get argocd/${argocd} -o json" "$2/${argocd}.json"
+  done
+}
+
+# gets applications; takes namespace and directory as arguments
+get_applications(){
+  echo " * Getting ArgoCD Applications in $1..."
+  run_and_log "oc get applications.argoproj.io -n $1" "$2/applications.txt"
+  for application in $(oc get applications.argoproj.io -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get applications.argoproj.io/${application}" "$2/${application}.txt"
+    run_and_log "oc -n $1 get applications.argoproj.io/${application} -o yaml" "$2/${application}.yaml"
+    run_and_log "oc -n $1 get applications.argoproj.io/${application} -o json" "$2/${application}.json"
+  done
+}
+
+# gets applicationSets; takes namespace and directory as arguments
+get_applicationSets(){
+  echo " * Getting ArgoCD ApplicationSets in $1..."
+  run_and_log "oc get applicationsets.argoproj.io -n $1" "$2/applicationsets.txt"
+  for applicationset in $(oc get applicationsets.argoproj.io -n "$1" -o jsonpath='{ .items[*].metadata.name }') ; do
+    run_and_log "oc -n $1 get applicationsets.argoproj.io/${applicationset}" "$2/${applicationset}.txt"
+    run_and_log "oc -n $1 get applicationsets.argoproj.io/${applicationset} -o yaml" "$2/${applicationset}.yaml"
+    run_and_log "oc -n $1 get applicationsets.argoproj.io/${applicationset} -o json" "$2/${applicationset}.json"
+  done
+}
+
+# gets Events; takes namespace and directory as parameter
+get_events(){
+  echo " * Getting warning events in $1..."
+  run_and_log "oc get events -n $1 --field-selector type=Warning" "$2/warning-events.txt"
+  echo " * Getting error events in $1..."
+  run_and_log "oc get events -n $1 --field-selector type=Error" "$2/error-events.txt"
+  echo " * Getting all events in $1..."
+  run_and_log "oc get events -n $1" "$2/all-events.txt"
 }
 
 function main() {
@@ -171,86 +281,37 @@ function main() {
     RESOURCES_DIR="${GITOPS_DIR}/namespace_${namespace}_resources"
     create_directory "${RESOURCES_DIR}"
 
-    echo " * Getting pods in ${namespace}..."
     POD_DIR="${RESOURCES_DIR}/pods"
     create_directory "${POD_DIR}"
-    run_and_log "oc get pods -n ${namespace}" "${POD_DIR}/pods.txt"
-    for pod in $(oc get pods -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get pod/${pod}" "${POD_DIR}/${pod}.txt"
-      run_and_log "oc -n ${namespace} get pod/${pod} -o yaml" "${POD_DIR}/${pod}.yaml"
-      run_and_log "oc -n ${namespace} get pod/${pod} -o json" "${POD_DIR}/${pod}.json"
-    done
+    get_pods "${namespace}" "${POD_DIR}"
  
-    echo " * Getting deployments in ${namespace}..."
     DEPLOYMENT_DIR="${RESOURCES_DIR}/deployments"
     create_directory "${DEPLOYMENT_DIR}"
-    run_and_log "oc get deployments -n ${namespace}" "${DEPLOYMENT_DIR}/deployments.txt"
-    for deployment in $(oc get deployments -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get deployment/${deployment}" "${DEPLOYMENT_DIR}/${deployment}.txt"
-      run_and_log "oc -n ${namespace} get deployment/${deployment} -o yaml" "${DEPLOYMENT_DIR}/${deployment}.yaml"
-      run_and_log "oc -n ${namespace} get deployment/${deployment} -o json" "${DEPLOYMENT_DIR}/${deployment}.json"
-    done
+    get_deployments "${namespace}" "${DEPLOYMENT_DIR}"
 
-    echo " * Getting services in ${namespace}..."
     SERVICE_DIR="${RESOURCES_DIR}/services"
     create_directory "${SERVICE_DIR}"
-    run_and_log "oc get services -n ${namespace}" "${SERVICE_DIR}/services.txt"
-    for service in $(oc get services -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get service/${service}" "${SERVICE_DIR}/${service}.txt"
-      run_and_log "oc -n ${namespace} get service/${service} -o yaml" "${SERVICE_DIR}/${service}.yaml"
-      run_and_log "oc -n ${namespace} get service/${service} -o json" "${SERVICE_DIR}/${service}.json"
-    done
+    get_services "${namespace}" "${SERVICE_DIR}"
 
-    echo " * Getting replicaSets in ${namespace}..."
     REPLICASET_DIR="${RESOURCES_DIR}/replicaSets"
     create_directory "${REPLICASET_DIR}"
-    run_and_log "oc get replicasets -n ${namespace}" "${REPLICASET_DIR}/replicaSets.txt"
-    for replicaset in $(oc get replicasets -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get replicaset/${replicaset}" "${REPLICASET_DIR}/${replicaset}.txt"
-      run_and_log "oc -n ${namespace} get replicaset/${replicaset} -o yaml" "${REPLICASET_DIR}/${replicaset}.yaml"
-      run_and_log "oc -n ${namespace} get replicaset/${replicaset} -o json" "${REPLICASET_DIR}/${replicaset}.json"
-    done
+    get_replicaSets "${namespace}" "${REPLICASET_DIR}"
 
-    echo " * Getting statefulsets in ${namespace}..."
     STATEFULSET_DIR="${RESOURCES_DIR}/statefulsets"
     create_directory "${STATEFULSET_DIR}"
-    run_and_log "oc get statefulsets -n ${namespace}" "${STATEFULSET_DIR}/statefulsets.txt"
-    for statefulset in $(oc get statefulsets -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get statefulset/${statefulset}" "${STATEFULSET_DIR}/${statefulset}.txt"
-      run_and_log "oc -n ${namespace} get statefulset/${statefulset} -o yaml" "${STATEFULSET_DIR}/${statefulset}.yaml"
-      run_and_log "oc -n ${namespace} get statefulset/${statefulset} -o json" "${STATEFULSET_DIR}/${statefulset}.json"
-    done
+    get_statefulSets "${namespace}" "${STATEFULSET_DIR}"
 
-    echo " * Getting routes in ${namespace}..."
     ROUTE_DIR="${RESOURCES_DIR}/routes"
     create_directory "${ROUTE_DIR}"
-    run_and_log "oc get routes -n ${namespace}" "${ROUTE_DIR}/routes.txt"
-    for route in $(oc get routes -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get route/${route}" "${ROUTE_DIR}/${route}.txt"
-      run_and_log "oc -n ${namespace} get route/${route} -o yaml" "${ROUTE_DIR}/${route}.yaml"
-      run_and_log "oc -n ${namespace} get route/${route} -o json" "${ROUTE_DIR}/${route}.json"
-    done
+    get_routes "${namespace}" "${ROUTE_DIR}"
 
-    echo " * Getting ArgoCD in ${namespace}..."
     ARGOCD_DIR="${RESOURCES_DIR}/argocd"
     create_directory "${ARGOCD_DIR}"
-    run_and_log "oc get argocd -n ${namespace}" "${ARGOCD_DIR}/argocd.txt"
-    for argocd in $(oc get argocd -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get argocd/${argocd}" "${ARGOCD_DIR}/${argocd}.txt"
-      run_and_log "oc -n ${namespace} get argocd/${argocd} -o yaml" "${ARGOCD_DIR}/${argocd}.yaml"
-      run_and_log "oc -n ${namespace} get argocd/${argocd} -o json" "${ARGOCD_DIR}/${argocd}.json"
-    done
+    get_argocds "${namespace}" "${ARGOCD_DIR}"
 
-    echo " * Getting ArgoCD Applications in ${namespace}..."
     APPLICATION_DIR="${ARGOCD_DIR}/applications"
     create_directory "${APPLICATION_DIR}"
-    run_and_log "oc get applications.argoproj.io -n ${namespace}" "${APPLICATION_DIR}/applications.txt"
-    for application in $(oc get applications.argoproj.io -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get applications.argoproj.io/${application}" "${APPLICATION_DIR}/${application}.txt"
-      run_and_log "oc -n ${namespace} get applications.argoproj.io/${application} -o yaml" "${APPLICATION_DIR}/${application}.yaml"
-      run_and_log "oc -n ${namespace} get applications.argoproj.io/${application} -o json" "${APPLICATION_DIR}/${application}.json"
-    done
-
+    get_applications "${namespace}" "${APPLICATION_DIR}"
 
     echo " * Getting ArgoCD Source Namespaces in ${namespace}..."
     local sourceNamespaces
@@ -258,37 +319,18 @@ function main() {
     sourceNamespaces=$(oc get argocd -n "${namespace}" -o jsonpath='{.items[*].spec.sourceNamespaces[*]}' )
     if [[ "${sourceNamespaces}" != "" ]] ; then
       for sourceNamespace in ${sourceNamespaces} ; do 
-        echo " * Getting ArgoCD Applications in ${sourceNamespace}..."
-        local sourceNamespaceApps
         SOURCED_DIR="${ARGOCD_DIR}/namespace_${sourceNamespace}_resources/applications"
-        run_and_log "oc get applications.argoproj.io -n ${sourceNamespace}" "$SOURCED_DIR/applications.txt"
-        sourceNamespaceApps=$(oc get applications.argoproj.io -n "${sourceNamespace}" -o jsonpath='{ .items[*].metadata.name }' )
-        for sourceNamespaceApp in ${sourceNamespaceApps}; do 
-          run_and_log "oc -n ${sourceNamespace} get applications.argoproj.io/${sourceNamespaceApp}" "${SOURCED_DIR}/${sourceNamespaceApp}.txt"
-          run_and_log "oc -n ${sourceNamespace} get applications.argoproj.io/${sourceNamespaceApp} -o yaml" "${SOURCED_DIR}/${sourceNamespaceApp}.yaml"
-          run_and_log "oc -n ${sourceNamespace} get applications.argoproj.io/${sourceNamespaceApp} -o json" "${SOURCED_DIR}/${sourceNamespaceApp}.json"
-        done
+        get_applications "${sourceNamespace}" "${SOURCED_DIR}"
       done
     fi
 
-    echo " * Getting ArgoCD ApplicationSets in ${namespace}..."
     APPLICATIONSETS_DIR="${ARGOCD_DIR}/applicationsets"
     create_directory "${APPLICATIONSETS_DIR}"
-    run_and_log "oc get applicationsets.argoproj.io -n ${namespace}" "${APPLICATIONSETS_DIR}/applicationsets.txt"
-    for applicationset in $(oc get applicationsets.argoproj.io -n "${namespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-      run_and_log "oc -n ${namespace} get applicationsets.argoproj.io/${applicationset}" "${APPLICATIONSETS_DIR}/${applicationset}.txt"
-      run_and_log "oc -n ${namespace} get applicationsets.argoproj.io/${applicationset} -o yaml" "${APPLICATIONSETS_DIR}/${applicationset}.yaml"
-      run_and_log "oc -n ${namespace} get applicationsets.argoproj.io/${applicationset} -o json" "${APPLICATIONSETS_DIR}/${applicationset}.json"
-    done
- 
-    echo " * Getting warning events in ${namespace}..."
-    EVENTS_DIR="${RESOURCES_DIR}/events"
+    get_applicationSets "${namespace}" "${APPLICATIONSETS_DIR}"
+
+    EVENTS_DIR="${RESOURCES_DIR}/events" 
     create_directory "${EVENTS_DIR}"
-    run_and_log "oc get events -n ${namespace} --field-selector type=Warning" "${EVENTS_DIR}/warning-events.txt"
-    echo " * Getting error events in ${namespace}..."
-    run_and_log "oc get events -n ${namespace} --field-selector type=Error" "${EVENTS_DIR}/error-events.txt"
-    echo " * Getting all events in ${namespace}..."
-    run_and_log "oc get events -n ${namespace}" "${EVENTS_DIR}/all-events.txt"
+    get_events "${namespace}" "${EVENTS_DIR}"
 
     echo " * Getting ArgoCD logs in ${namespace}..."
     ARGOCD_LOG_DIR="${ARGOCD_DIR}/logs"
@@ -310,65 +352,29 @@ function main() {
       MANAGED_RESOURCES_DIR="${RESOURCES_DIR}/managedNamespace_${managedNamespace}"
       create_directory "${MANAGED_RESOURCES_DIR}"
 
-      echo " * Getting Pods for ArgoCD Managed namespace ${managedNamespace}..."
       MANAGED_RESOURCES_PODS_DIR="${MANAGED_RESOURCES_DIR}/pods"
       create_directory "${MANAGED_RESOURCES_PODS_DIR}"
-      run_and_log "oc get pods -n ${managedNamespace}" "${MANAGED_RESOURCES_PODS_DIR}/pods.txt"
-      for pod in $(oc get pods -n "${managedNamespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-        run_and_log "oc -n ${managedNamespace} get pod/${pod}" "${MANAGED_RESOURCES_PODS_DIR}/${pod}.txt"
-        run_and_log "oc -n ${managedNamespace} get pod/${pod} -o yaml" "${MANAGED_RESOURCES_PODS_DIR}/${pod}.yaml"
-        run_and_log "oc -n ${managedNamespace} logs pod/${pod}" "${MANAGED_RESOURCES_PODS_DIR}/${pod}-logs.txt"
-      done
+      get_pods "${managedNamespace}" "${MANAGED_RESOURCES_PODS_DIR}"
 
-      echo " * Getting Deployments for ArgoCD Managed namespace ${managedNamespace}..."
       MANAGED_RESOURCES_DEPLOYMENTS_DIR="${MANAGED_RESOURCES_DIR}/deployments"
       create_directory "${MANAGED_RESOURCES_DEPLOYMENTS_DIR}"
-      run_and_log "oc get deployments -n ${managedNamespace}" "${MANAGED_RESOURCES_DEPLOYMENTS_DIR}/deployments.txt"
-      for deployment in $(oc get deployments -n "${managedNamespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-        run_and_log "oc -n ${managedNamespace} get deployment ${deployment}" "${MANAGED_RESOURCES_DEPLOYMENTS_DIR}/${deployment}.txt"
-        run_and_log "oc -n ${managedNamespace} get deployment/${deployment} -o yaml" "${MANAGED_RESOURCES_DEPLOYMENTS_DIR}/${deployment}.yaml"
-        run_and_log "oc -n ${managedNamespace} get deployment/${deployment} -o json" "${MANAGED_RESOURCES_DEPLOYMENTS_DIR}/${deployment}.json"
-      done
+      get_deployments "${managedNamespace}" "${MANAGED_RESOURCES_DEPLOYMENTS_DIR}"
 
-      echo " * Getting Services for ArgoCD Managed namespace ${managedNamespace}..."
       MANAGED_RESOURCES_SERVICES_DIR="${MANAGED_RESOURCES_DIR}/services"
       create_directory "${MANAGED_RESOURCES_SERVICES_DIR}"
-      run_and_log "oc get services -n ${managedNamespace}" "${MANAGED_RESOURCES_SERVICES_DIR}/services.txt"
-      for service in $(oc get services -n "${managedNamespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-        run_and_log "oc -n ${managedNamespace} get service/${service}" "${MANAGED_RESOURCES_SERVICES_DIR}/${service}.txt"
-        run_and_log "oc -n ${managedNamespace} get service/${service} -o yaml" "${MANAGED_RESOURCES_SERVICES_DIR}/${service}.yaml"
-        run_and_log "oc -n ${managedNamespace} get service/${service} -o json" "${MANAGED_RESOURCES_SERVICES_DIR}/${service}.json"
-      done
+      get_services "${managedNamespace}" "${MANAGED_RESOURCES_SERVICES_DIR}"
 
-      echo " * Getting Routes for ArgoCD Managed namespace ${managedNamespace}..."
       MANAGED_RESOURCES_ROUTES_DIR="${MANAGED_RESOURCES_DIR}/routes"
       create_directory "${MANAGED_RESOURCES_ROUTES_DIR}"
-      run_and_log "oc get routes -n ${managedNamespace}" "${MANAGED_RESOURCES_ROUTES_DIR}/routes.txt"
-      for route in $(oc get routes -n "${managedNamespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-        run_and_log "oc -n ${managedNamespace} get route/${route}" "${MANAGED_RESOURCES_ROUTES_DIR}/${route}.txt"
-        run_and_log "oc -n ${managedNamespace} get route/${route} -o yaml" "${MANAGED_RESOURCES_ROUTES_DIR}/${route}.yaml"
-        run_and_log "oc -n ${managedNamespace} get route/${route} -o json" "${MANAGED_RESOURCES_ROUTES_DIR}/${route}.json"
-      done
+      get_routes "${managedNamespace}" "${MANAGED_RESOURCES_ROUTES_DIR}"
 
-      echo " * Getting ReplicaSets for ArgoCD Managed namespace ${managedNamespace}..."
       MANAGED_RESOURCES_REPLICASETS_DIR="${MANAGED_RESOURCES_DIR}/replicasets"
       create_directory "${MANAGED_RESOURCES_REPLICASETS_DIR}"
-      run_and_log "oc get replicasets -n ${managedNamespace}" "${MANAGED_RESOURCES_REPLICASETS_DIR}/replicasets.txt"
-      for replicaset in $(oc get replicasets -n "${managedNamespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-        run_and_log "oc -n ${managedNamespace} get replicaset/${replicaset}" "${MANAGED_RESOURCES_REPLICASETS_DIR}/${replicaset}.txt"
-        run_and_log "oc -n ${managedNamespace} get replicaset/${replicaset} -o yaml" "${MANAGED_RESOURCES_REPLICASETS_DIR}/${replicaset}.yaml"
-        run_and_log "oc -n ${managedNamespace} get replicaset/${replicaset} -o json" "${MANAGED_RESOURCES_REPLICASETS_DIR}/${replicaset}.json"
-      done
+      get_replicaSets "${managedNamespace}" "${MANAGED_RESOURCES_REPLICASETS_DIR}"
 
-      echo " * Getting StatefulSets for ArgoCD Managed namespace ${managedNamespace}..."
       MANAGED_RESOURCES_STATEFULSETS_DIR="${MANAGED_RESOURCES_DIR}/statefulsets"
       create_directory "${MANAGED_RESOURCES_STATEFULSETS_DIR}"
-      run_and_log "oc get statefulsets -n ${managedNamespace}" "${MANAGED_RESOURCES_STATEFULSETS_DIR}/statefulsets.txt"
-      for statefulset in $(oc get statefulsets -n "${managedNamespace}" -o jsonpath='{ .items[*].metadata.name }') ; do
-        run_and_log "oc -n ${managedNamespace} get statefulset/${statefulset}" "${MANAGED_RESOURCES_STATEFULSETS_DIR}/${statefulset}.txt"
-        run_and_log "oc -n ${managedNamespace} get statefulset/${statefulset} -o yaml" "${MANAGED_RESOURCES_STATEFULSETS_DIR}/${statefulset}.yaml"
-        run_and_log "oc -n ${managedNamespace} get statefulset/${statefulset} -o json" "${MANAGED_RESOURCES_STATEFULSETS_DIR}/${statefulset}.json"
-      done
+      get_statefulSets "${managedNamespace}" "${MANAGED_RESOURCES_STATEFULSETS_DIR}"
     done
   done
 
