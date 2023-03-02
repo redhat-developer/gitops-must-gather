@@ -272,6 +272,11 @@ function main() {
   echo " * Getting OpenShift Cluster Version..."
   run_and_log "oc version" "$GITOPS_DIR/oc-version.txt"
 
+  # requirement for custom must-gathers, see https://github.com/openshift/enhancements/blob/a5841f75dbc9afbab22e5baa8d2f1ff2f43e2df7/enhancements/oc/must-gather.md?plain=1#L88
+  echo " * Getting OpenShift GitOps Version..."
+  csv_name="$(oc -n openshift-gitops get csv -o name | grep 'openshift-gitops-operator')"
+  oc -n openshift-gitops get "${csv_name}" -o jsonpath='{.spec.displayName}{"\n"}{.spec.version}' > "$GITOPS_DIR/version.txt"
+
   echo " * Getting GitOps Operator Subscription..."
   run_and_log "oc get subs openshift-gitops-operator -n openshift-operators -o yaml" "$GITOPS_DIR/subscription.yaml"
   run_and_log "oc get subs openshift-gitops-operator -n openshift-operators -o json" "$GITOPS_DIR/subscription.json"
