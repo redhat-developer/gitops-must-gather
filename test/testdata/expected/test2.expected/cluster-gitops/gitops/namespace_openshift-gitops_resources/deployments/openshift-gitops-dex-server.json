@@ -1,0 +1,211 @@
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "2"
+        },
+        "creationTimestamp": "2023-03-06T20:00:50Z",
+        "generation": 2,
+        "labels": {
+            "app.kubernetes.io/component": "dex-server",
+            "app.kubernetes.io/managed-by": "openshift-gitops",
+            "app.kubernetes.io/name": "openshift-gitops-dex-server",
+            "app.kubernetes.io/part-of": "argocd"
+        },
+        "name": "openshift-gitops-dex-server",
+        "namespace": "openshift-gitops",
+        "ownerReferences": [
+            {
+                "apiVersion": "argoproj.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ArgoCD",
+                "name": "openshift-gitops",
+                "uid": "6f84ba67-afc2-4a8a-a183-cb61ad300aa9"
+            }
+        ],
+        "resourceVersion": "681964",
+        "uid": "e0cd056e-63d9-4874-951a-20fdf12dfca7"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app.kubernetes.io/name": "openshift-gitops-dex-server"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": "25%",
+                "maxUnavailable": "25%"
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                    "app.kubernetes.io/name": "openshift-gitops-dex-server",
+                    "dex.config.changed": "03062023-200023-UTC"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "command": [
+                            "/shared/argocd-dex",
+                            "rundex"
+                        ],
+                        "image": "registry.redhat.io/openshift-gitops-1/dex-rhel8@sha256:185d4c4584e0a891f99f461ba4554e948e4ec2c1cabeffc99e0c9d84e4cdc374",
+                        "imagePullPolicy": "IfNotPresent",
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz/live",
+                                "port": 5558,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 60,
+                            "periodSeconds": 30,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "name": "dex",
+                        "ports": [
+                            {
+                                "containerPort": 5556,
+                                "name": "http",
+                                "protocol": "TCP"
+                            },
+                            {
+                                "containerPort": 5557,
+                                "name": "grpc",
+                                "protocol": "TCP"
+                            },
+                            {
+                                "containerPort": 5558,
+                                "name": "metrics",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "250m",
+                                "memory": "128Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "runAsNonRoot": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/shared",
+                                "name": "static-files"
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "initContainers": [
+                    {
+                        "command": [
+                            "cp",
+                            "-n",
+                            "/usr/local/bin/argocd",
+                            "/shared/argocd-dex"
+                        ],
+                        "image": "registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f",
+                        "imagePullPolicy": "Always",
+                        "name": "copyutil",
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "250m",
+                                "memory": "128Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "runAsNonRoot": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/shared",
+                                "name": "static-files"
+                            }
+                        ]
+                    }
+                ],
+                "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                },
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "openshift-gitops-argocd-dex-server",
+                "serviceAccountName": "openshift-gitops-argocd-dex-server",
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                    {
+                        "emptyDir": {},
+                        "name": "static-files"
+                    }
+                ]
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 1,
+        "conditions": [
+            {
+                "lastTransitionTime": "2023-03-06T20:01:14Z",
+                "lastUpdateTime": "2023-03-06T20:01:14Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2023-03-06T20:00:50Z",
+                "lastUpdateTime": "2023-03-06T20:01:29Z",
+                "message": "ReplicaSet \"openshift-gitops-dex-server-56594c64b8\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 2,
+        "readyReplicas": 1,
+        "replicas": 1,
+        "updatedReplicas": 1
+    }
+}

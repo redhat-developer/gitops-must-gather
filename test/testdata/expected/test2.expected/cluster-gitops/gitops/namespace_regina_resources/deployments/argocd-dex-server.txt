@@ -1,0 +1,2 @@
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+argocd-dex-server   1/1     1            1           54m

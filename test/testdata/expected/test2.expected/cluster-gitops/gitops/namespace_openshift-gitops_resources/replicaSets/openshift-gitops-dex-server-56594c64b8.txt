@@ -1,0 +1,2 @@
+NAME                                     DESIRED   CURRENT   READY   AGE
+openshift-gitops-dex-server-56594c64b8   1         1         1       56m

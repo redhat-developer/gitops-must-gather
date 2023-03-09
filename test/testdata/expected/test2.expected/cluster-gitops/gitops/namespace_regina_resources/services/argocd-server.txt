@@ -1,0 +1,2 @@
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+argocd-server   ClusterIP   172.30.54.170   <none>        80/TCP,443/TCP   54m

@@ -1,0 +1,60 @@
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "creationTimestamp": "2023-03-06T20:03:17Z",
+        "labels": {
+            "app.kubernetes.io/component": "dex-server",
+            "app.kubernetes.io/managed-by": "argocd",
+            "app.kubernetes.io/name": "argocd-dex-server",
+            "app.kubernetes.io/part-of": "argocd"
+        },
+        "name": "argocd-dex-server",
+        "namespace": "regina",
+        "ownerReferences": [
+            {
+                "apiVersion": "argoproj.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ArgoCD",
+                "name": "argocd",
+                "uid": "7f0f337d-5072-48b6-af9a-2c90a74656dd"
+            }
+        ],
+        "resourceVersion": "683686",
+        "uid": "3a50e769-6b6b-4ae0-b47b-0e510496bf9e"
+    },
+    "spec": {
+        "clusterIP": "172.30.137.175",
+        "clusterIPs": [
+            "172.30.137.175"
+        ],
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "name": "http",
+                "port": 5556,
+                "protocol": "TCP",
+                "targetPort": 5556
+            },
+            {
+                "name": "grpc",
+                "port": 5557,
+                "protocol": "TCP",
+                "targetPort": 5557
+            }
+        ],
+        "selector": {
+            "app.kubernetes.io/name": "argocd-dex-server"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}

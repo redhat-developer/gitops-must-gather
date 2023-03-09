@@ -1,0 +1,256 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "openshift-sdn",
+          "interface": "eth0",
+          "ips": [
+              "10.130.0.205"
+          ],
+          "default": true,
+          "dns": {}
+      }]
+    k8s.v1.cni.cncf.io/networks-status: |-
+      [{
+          "name": "openshift-sdn",
+          "interface": "eth0",
+          "ips": [
+              "10.130.0.205"
+          ],
+          "default": true,
+          "dns": {}
+      }]
+    openshift.io/scc: restricted-v2
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+  creationTimestamp: "2023-03-06T20:00:52Z"
+  generateName: openshift-gitops-repo-server-54c7998dbf-
+  labels:
+    app.kubernetes.io/name: openshift-gitops-repo-server
+    pod-template-hash: 54c7998dbf
+  name: openshift-gitops-repo-server-54c7998dbf-l5h7t
+  namespace: openshift-gitops
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: openshift-gitops-repo-server-54c7998dbf
+    uid: 89f55647-b073-4637-b3a3-0d7679316984
+  resourceVersion: "681786"
+  uid: e289fb72-6054-47ef-bc06-d34ba70f1cd9
+spec:
+  automountServiceAccountToken: false
+  containers:
+  - command:
+    - uid_entrypoint.sh
+    - argocd-repo-server
+    - --redis
+    - openshift-gitops-redis.openshift-gitops.svc.cluster.local:6379
+    - --loglevel
+    - info
+    - --logformat
+    - text
+    image: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    imagePullPolicy: Always
+    livenessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      tcpSocket:
+        port: 8081
+      timeoutSeconds: 1
+    name: argocd-repo-server
+    ports:
+    - containerPort: 8081
+      name: server
+      protocol: TCP
+    - containerPort: 8084
+      name: metrics
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 3
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      tcpSocket:
+        port: 8081
+      timeoutSeconds: 1
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1000720000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /app/config/ssh
+      name: ssh-known-hosts
+    - mountPath: /app/config/tls
+      name: tls-certs
+    - mountPath: /app/config/gpg/source
+      name: gpg-keys
+    - mountPath: /app/config/gpg/keys
+      name: gpg-keyring
+    - mountPath: /tmp
+      name: tmp
+    - mountPath: /app/config/reposerver/tls
+      name: argocd-repo-server-tls
+    - mountPath: /app/config/reposerver/tls/redis
+      name: argocd-operator-redis-tls
+    - mountPath: /home/argocd/cmp-server/plugins
+      name: plugins
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  imagePullSecrets:
+  - name: default-dockercfg-296kt
+  initContainers:
+  - command:
+    - cp
+    - -n
+    - /usr/local/bin/argocd
+    - /var/run/argocd/argocd-cmp-server
+    image: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    imagePullPolicy: Always
+    name: copyutil
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1000720000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/argocd
+      name: var-files
+  nodeName: ip-10-0-150-112.us-east-2.compute.internal
+  nodeSelector:
+    kubernetes.io/os: linux
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext:
+    fsGroup: 1000720000
+    seLinuxOptions:
+      level: s0:c27,c9
+    seccompProfile:
+      type: RuntimeDefault
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoSchedule
+    key: node.kubernetes.io/memory-pressure
+    operator: Exists
+  volumes:
+  - configMap:
+      defaultMode: 420
+      name: argocd-ssh-known-hosts-cm
+    name: ssh-known-hosts
+  - configMap:
+      defaultMode: 420
+      name: argocd-tls-certs-cm
+    name: tls-certs
+  - configMap:
+      defaultMode: 420
+      name: argocd-gpg-keys-cm
+    name: gpg-keys
+  - emptyDir: {}
+    name: gpg-keyring
+  - emptyDir: {}
+    name: tmp
+  - name: argocd-repo-server-tls
+    secret:
+      defaultMode: 420
+      optional: true
+      secretName: argocd-repo-server-tls
+  - name: argocd-operator-redis-tls
+    secret:
+      defaultMode: 420
+      optional: true
+      secretName: argocd-operator-redis-tls
+  - emptyDir: {}
+    name: var-files
+  - emptyDir: {}
+    name: plugins
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-03-06T20:01:10Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-03-06T20:01:23Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-03-06T20:01:23Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-03-06T20:00:52Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: cri-o://bf283d0b904ade93618b1daeb7dad8fca31ffb108bf8747f9a9c349fa6759a3d
+    image: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    imageID: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    lastState: {}
+    name: argocd-repo-server
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2023-03-06T20:01:11Z"
+  hostIP: 10.0.150.112
+  initContainerStatuses:
+  - containerID: cri-o://ba902df4eeb3c5c6c2d94c6a8e061348f25d7122dce04fadd0139e6adbd6d478
+    image: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    imageID: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    lastState: {}
+    name: copyutil
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: cri-o://ba902df4eeb3c5c6c2d94c6a8e061348f25d7122dce04fadd0139e6adbd6d478
+        exitCode: 0
+        finishedAt: "2023-03-06T20:01:09Z"
+        reason: Completed
+        startedAt: "2023-03-06T20:01:09Z"
+  phase: Running
+  podIP: 10.130.0.205
+  podIPs:
+  - ip: 10.130.0.205
+  qosClass: Burstable
+  startTime: "2023-03-06T20:00:52Z"

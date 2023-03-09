@@ -1,0 +1,2 @@
+NAME                                      READY   AGE
+openshift-gitops-application-controller   1/1     56m

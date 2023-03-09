@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.alpha.openshift.io/serving-cert-signed-by: openshift-service-serving-signer@1678079402
+    service.beta.openshift.io/serving-cert-secret-name: cluster
+    service.beta.openshift.io/serving-cert-signed-by: openshift-service-serving-signer@1678079402
+  creationTimestamp: "2023-03-06T20:00:50Z"
+  name: cluster
+  namespace: openshift-gitops
+  ownerReferences:
+  - apiVersion: pipelines.openshift.io/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: GitopsService
+    name: cluster
+    uid: 11dcbd2a-26d0-4233-9a7f-b7370ff9da4e
+  resourceVersion: "680518"
+  uid: bc4fe027-0322-4623-b81b-0c9327171e64
+spec:
+  clusterIP: 172.30.219.37
+  clusterIPs:
+  - 172.30.219.37
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/name: cluster
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

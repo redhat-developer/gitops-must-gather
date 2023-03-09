@@ -1,0 +1,2 @@
+NAME                       DESIRED   CURRENT   READY   AGE
+argocd-server-865dbdbb97   1         1         1       54m

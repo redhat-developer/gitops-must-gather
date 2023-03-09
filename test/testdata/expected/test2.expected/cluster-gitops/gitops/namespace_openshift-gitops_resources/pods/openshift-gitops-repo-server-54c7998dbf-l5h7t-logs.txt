@@ -1,0 +1,20 @@
+time="2023-03-06T20:01:11Z" level=info msg="ArgoCD Repository Server is starting" built="2023-02-13T09:50:50Z" commit= port=8081 version=v2.5.11+unknown
+time="2023-03-06T20:01:11Z" level=info msg="Generating self-signed TLS certificate for this session"
+time="2023-03-06T20:01:11Z" level=info msg="Initializing GnuPG keyring at /app/config/gpg/keys"
+time="2023-03-06T20:01:11Z" level=info msg="gpg --no-permission-warning --logger-fd 1 --batch --gen-key /tmp/gpg-key-recipe4111320461" dir= execID=a827f
+time="2023-03-06T20:01:11Z" level=info msg=Trace args="[gpg --no-permission-warning --logger-fd 1 --batch --gen-key /tmp/gpg-key-recipe4111320461]" dir= operation_name="exec gpg" time_ms=199.950441
+time="2023-03-06T20:01:11Z" level=info msg="Populating GnuPG keyring with keys from /app/config/gpg/source"
+time="2023-03-06T20:01:11Z" level=info msg="gpg --no-permission-warning --list-public-keys" dir= execID=415f9
+time="2023-03-06T20:01:11Z" level=info msg=Trace args="[gpg --no-permission-warning --list-public-keys]" dir= operation_name="exec gpg" time_ms=3.4413
+time="2023-03-06T20:01:11Z" level=info msg="gpg --no-permission-warning -a --export 7453936A8EB703FF" dir= execID=4bf7b
+time="2023-03-06T20:01:11Z" level=info msg=Trace args="[gpg --no-permission-warning -a --export 7453936A8EB703FF]" dir= operation_name="exec gpg" time_ms=2.722377
+time="2023-03-06T20:01:11Z" level=info msg="gpg-wrapper.sh --no-permission-warning --list-secret-keys 7453936A8EB703FF" dir= execID=e88d7
+time="2023-03-06T20:01:11Z" level=info msg=Trace args="[gpg-wrapper.sh --no-permission-warning --list-secret-keys 7453936A8EB703FF]" dir= operation_name="exec gpg-wrapper.sh" time_ms=6.9966159999999995
+time="2023-03-06T20:01:11Z" level=info msg="Loaded 0 (and removed 0) keys from keyring"
+time="2023-03-06T20:01:11Z" level=info msg="argocd-repo-server is listening on [::]:8081"
+time="2023-03-06T20:01:11Z" level=info msg="Starting GPG sync watcher on directory '/app/config/gpg/source'"
+time="2023-03-06T20:11:11Z" level=info msg="Alloc=11757 TotalAlloc=30684 Sys=28753 NumGC=8 Goroutines=17"
+time="2023-03-06T20:21:11Z" level=info msg="Alloc=11625 TotalAlloc=40159 Sys=28753 NumGC=13 Goroutines=17"
+time="2023-03-06T20:31:11Z" level=info msg="Alloc=11470 TotalAlloc=52167 Sys=32849 NumGC=18 Goroutines=17"
+time="2023-03-06T20:41:11Z" level=info msg="Alloc=11249 TotalAlloc=62515 Sys=32849 NumGC=23 Goroutines=17"
+time="2023-03-06T20:51:11Z" level=info msg="Alloc=11115 TotalAlloc=74463 Sys=32849 NumGC=28 Goroutines=17"

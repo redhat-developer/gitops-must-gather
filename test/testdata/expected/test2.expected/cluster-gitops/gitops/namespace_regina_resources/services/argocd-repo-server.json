@@ -1,0 +1,60 @@
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "creationTimestamp": "2023-03-06T20:03:18Z",
+        "labels": {
+            "app.kubernetes.io/component": "repo-server",
+            "app.kubernetes.io/managed-by": "argocd",
+            "app.kubernetes.io/name": "argocd-repo-server",
+            "app.kubernetes.io/part-of": "argocd"
+        },
+        "name": "argocd-repo-server",
+        "namespace": "regina",
+        "ownerReferences": [
+            {
+                "apiVersion": "argoproj.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ArgoCD",
+                "name": "argocd",
+                "uid": "7f0f337d-5072-48b6-af9a-2c90a74656dd"
+            }
+        ],
+        "resourceVersion": "683801",
+        "uid": "0acdb866-ab69-4cf8-b138-0701f4efd29f"
+    },
+    "spec": {
+        "clusterIP": "172.30.95.88",
+        "clusterIPs": [
+            "172.30.95.88"
+        ],
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "name": "server",
+                "port": 8081,
+                "protocol": "TCP",
+                "targetPort": 8081
+            },
+            {
+                "name": "metrics",
+                "port": 8084,
+                "protocol": "TCP",
+                "targetPort": 8084
+            }
+        ],
+        "selector": {
+            "app.kubernetes.io/name": "argocd-repo-server"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}

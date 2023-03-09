@@ -1,0 +1,2 @@
+NAME        SYNC STATUS   HEALTH STATUS
+guestbook   Unknown       Missing

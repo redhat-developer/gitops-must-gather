@@ -1,0 +1,9 @@
+NAME                                                          READY   STATUS    RESTARTS   AGE
+cluster-54f5bcdc85-mhbvh                                      1/1     Running   0          55m
+kam-7d7bfc8675-s79l8                                          1/1     Running   0          55m
+openshift-gitops-application-controller-0                     1/1     Running   0          55m
+openshift-gitops-applicationset-controller-5cf7bb9dbc-tscqc   1/1     Running   0          55m
+openshift-gitops-dex-server-56594c64b8-cnthv                  1/1     Running   0          55m
+openshift-gitops-redis-bb656787d-8p42v                        1/1     Running   0          55m
+openshift-gitops-repo-server-54c7998dbf-l5h7t                 1/1     Running   0          55m
+openshift-gitops-server-786849cbb8-w5lrt                      1/1     Running   0          55m

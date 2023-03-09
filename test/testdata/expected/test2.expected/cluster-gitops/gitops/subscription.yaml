@@ -1,0 +1,97 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  creationTimestamp: "2023-03-06T20:00:16Z"
+  generation: 1
+  labels:
+    operators.coreos.com/openshift-gitops-operator.openshift-operators: ""
+  name: openshift-gitops-operator
+  namespace: openshift-operators
+  resourceVersion: "680200"
+  uid: efa88ad3-5683-4fae-a5da-0da759c0c4b3
+spec:
+  channel: latest
+  installPlanApproval: Automatic
+  name: openshift-gitops-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: openshift-gitops-operator.v1.7.2
+status:
+  catalogHealth:
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: certified-operators
+      namespace: openshift-marketplace
+      resourceVersion: "678354"
+      uid: b527a6ca-6b4e-40e2-a8d8-9394f1d1095b
+    healthy: true
+    lastUpdated: "2023-03-06T20:00:16Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: community-operators
+      namespace: openshift-marketplace
+      resourceVersion: "677662"
+      uid: 66e3987c-333b-4e66-9d4f-fc8419ab08b8
+    healthy: true
+    lastUpdated: "2023-03-06T20:00:16Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: operatorhubio-catalog
+      namespace: openshift-marketplace
+      resourceVersion: "605185"
+      uid: ef2a7d3e-5d38-4808-ab28-e0cb05287592
+    healthy: true
+    lastUpdated: "2023-03-06T20:00:16Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: redhat-marketplace
+      namespace: openshift-marketplace
+      resourceVersion: "674144"
+      uid: 926cd78f-c3e9-4366-a55f-b7e209355b9f
+    healthy: true
+    lastUpdated: "2023-03-06T20:00:16Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: redhat-operators
+      namespace: openshift-marketplace
+      resourceVersion: "674299"
+      uid: bd0317c8-877e-4dd6-93a2-bd26920cf683
+    healthy: true
+    lastUpdated: "2023-03-06T20:00:16Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: sbo-catalog
+      namespace: openshift-marketplace
+      resourceVersion: "678364"
+      uid: eefc3e2c-f66f-490f-bd03-48da99f88268
+    healthy: true
+    lastUpdated: "2023-03-06T20:00:16Z"
+  conditions:
+  - lastTransitionTime: "2023-03-06T20:00:16Z"
+    message: all available catalogsources are healthy
+    reason: AllCatalogSourcesHealthy
+    status: "False"
+    type: CatalogSourcesUnhealthy
+  currentCSV: openshift-gitops-operator.v1.7.2
+  installPlanGeneration: 8
+  installPlanRef:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-pjg65
+    namespace: openshift-operators
+    resourceVersion: "679588"
+    uid: a236fa20-20e3-4446-8de4-58f7e8f38b66
+  installedCSV: openshift-gitops-operator.v1.7.2
+  installplan:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-pjg65
+    uuid: a236fa20-20e3-4446-8de4-58f7e8f38b66
+  lastUpdated: "2023-03-06T20:00:42Z"
+  state: AtLatestKnown

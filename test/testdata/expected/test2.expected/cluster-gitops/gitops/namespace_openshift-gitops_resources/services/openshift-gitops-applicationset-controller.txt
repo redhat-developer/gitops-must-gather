@@ -1,0 +1,2 @@
+NAME                                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+openshift-gitops-applicationset-controller   ClusterIP   172.30.16.219   <none>        7000/TCP,8080/TCP   56m

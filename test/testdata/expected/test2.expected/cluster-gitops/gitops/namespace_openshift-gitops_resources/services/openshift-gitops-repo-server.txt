@@ -1,0 +1,2 @@
+NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+openshift-gitops-repo-server   ClusterIP   172.30.149.185   <none>        8081/TCP,8084/TCP   56m

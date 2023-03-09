@@ -1,0 +1,199 @@
+{
+    "apiVersion": "apps/v1",
+    "kind": "StatefulSet",
+    "metadata": {
+        "creationTimestamp": "2023-03-06T20:00:52Z",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/component": "application-controller",
+            "app.kubernetes.io/managed-by": "openshift-gitops",
+            "app.kubernetes.io/name": "openshift-gitops-application-controller",
+            "app.kubernetes.io/part-of": "argocd"
+        },
+        "name": "openshift-gitops-application-controller",
+        "namespace": "openshift-gitops",
+        "ownerReferences": [
+            {
+                "apiVersion": "argoproj.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ArgoCD",
+                "name": "openshift-gitops",
+                "uid": "6f84ba67-afc2-4a8a-a183-cb61ad300aa9"
+            }
+        ],
+        "resourceVersion": "682042",
+        "uid": "dec8d225-8d12-45ae-9227-1c0dcc5ca912"
+    },
+    "spec": {
+        "podManagementPolicy": "OrderedReady",
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app.kubernetes.io/name": "openshift-gitops-application-controller"
+            }
+        },
+        "serviceName": "openshift-gitops-application-controller",
+        "template": {
+            "metadata": {
+                "creationTimestamp": null,
+                "labels": {
+                    "app.kubernetes.io/name": "openshift-gitops-application-controller"
+                }
+            },
+            "spec": {
+                "affinity": {
+                    "podAntiAffinity": {
+                        "preferredDuringSchedulingIgnoredDuringExecution": [
+                            {
+                                "podAffinityTerm": {
+                                    "labelSelector": {
+                                        "matchLabels": {
+                                            "app.kubernetes.io/name": "openshift-gitops-argocd-application-controller"
+                                        }
+                                    },
+                                    "topologyKey": "kubernetes.io/hostname"
+                                },
+                                "weight": 100
+                            },
+                            {
+                                "podAffinityTerm": {
+                                    "labelSelector": {
+                                        "matchLabels": {
+                                            "app.kubernetes.io/part-of": "argocd"
+                                        }
+                                    },
+                                    "topologyKey": "kubernetes.io/hostname"
+                                },
+                                "weight": 5
+                            }
+                        ]
+                    }
+                },
+                "containers": [
+                    {
+                        "command": [
+                            "argocd-application-controller",
+                            "--operation-processors",
+                            "10",
+                            "--redis",
+                            "openshift-gitops-redis.openshift-gitops.svc.cluster.local:6379",
+                            "--repo-server",
+                            "openshift-gitops-repo-server.openshift-gitops.svc.cluster.local:8081",
+                            "--status-processors",
+                            "20",
+                            "--kubectl-parallelism-limit",
+                            "10",
+                            "--loglevel",
+                            "info",
+                            "--logformat",
+                            "text"
+                        ],
+                        "image": "registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f",
+                        "imagePullPolicy": "Always",
+                        "name": "argocd-application-controller",
+                        "ports": [
+                            {
+                                "containerPort": 8082,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/healthz",
+                                "port": 8082,
+                                "scheme": "HTTP"
+                            },
+                            "initialDelaySeconds": 5,
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "2",
+                                "memory": "2Gi"
+                            },
+                            "requests": {
+                                "cpu": "250m",
+                                "memory": "1Gi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "runAsNonRoot": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/app/config/controller/tls",
+                                "name": "argocd-repo-server-tls"
+                            },
+                            {
+                                "mountPath": "/app/config/controller/tls/redis",
+                                "name": "argocd-operator-redis-tls"
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                },
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "openshift-gitops-argocd-application-controller",
+                "serviceAccountName": "openshift-gitops-argocd-application-controller",
+                "terminationGracePeriodSeconds": 30,
+                "volumes": [
+                    {
+                        "name": "argocd-repo-server-tls",
+                        "secret": {
+                            "defaultMode": 420,
+                            "optional": true,
+                            "secretName": "argocd-repo-server-tls"
+                        }
+                    },
+                    {
+                        "name": "argocd-operator-redis-tls",
+                        "secret": {
+                            "defaultMode": 420,
+                            "optional": true,
+                            "secretName": "argocd-operator-redis-tls"
+                        }
+                    }
+                ]
+            }
+        },
+        "updateStrategy": {
+            "rollingUpdate": {
+                "partition": 0
+            },
+            "type": "RollingUpdate"
+        }
+    },
+    "status": {
+        "availableReplicas": 1,
+        "collisionCount": 0,
+        "currentReplicas": 1,
+        "currentRevision": "openshift-gitops-application-controller-7cf5d6584d",
+        "observedGeneration": 1,
+        "readyReplicas": 1,
+        "replicas": 1,
+        "updateRevision": "openshift-gitops-application-controller-7cf5d6584d",
+        "updatedReplicas": 1
+    }
+}

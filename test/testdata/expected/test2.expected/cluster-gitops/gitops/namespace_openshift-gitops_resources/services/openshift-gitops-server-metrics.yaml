@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2023-03-06T20:00:52Z"
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/managed-by: openshift-gitops
+    app.kubernetes.io/name: openshift-gitops-server-metrics
+    app.kubernetes.io/part-of: argocd
+  name: openshift-gitops-server-metrics
+  namespace: openshift-gitops
+  ownerReferences:
+  - apiVersion: argoproj.io/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ArgoCD
+    name: openshift-gitops
+    uid: 6f84ba67-afc2-4a8a-a183-cb61ad300aa9
+  resourceVersion: "680652"
+  uid: 7b0e0897-1faa-4803-b042-cd152172a845
+spec:
+  clusterIP: 172.30.11.47
+  clusterIPs:
+  - 172.30.11.47
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: metrics
+    port: 8083
+    protocol: TCP
+    targetPort: 8083
+  selector:
+    app.kubernetes.io/name: openshift-gitops-server
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

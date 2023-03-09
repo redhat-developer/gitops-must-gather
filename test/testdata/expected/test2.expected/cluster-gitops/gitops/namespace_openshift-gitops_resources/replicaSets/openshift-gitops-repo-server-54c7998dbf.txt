@@ -1,0 +1,2 @@
+NAME                                      DESIRED   CURRENT   READY   AGE
+openshift-gitops-repo-server-54c7998dbf   1         1         1       56m

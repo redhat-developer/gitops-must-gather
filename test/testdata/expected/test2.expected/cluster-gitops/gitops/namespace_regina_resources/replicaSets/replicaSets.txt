@@ -1,0 +1,6 @@
+NAME                            DESIRED   CURRENT   READY   AGE
+argocd-dex-server-56457f6bf7    0         0         0       54m
+argocd-dex-server-77b96484bd    1         1         1       54m
+argocd-redis-765dcbf76c         1         1         1       54m
+argocd-repo-server-7d748b44fb   1         1         1       54m
+argocd-server-865dbdbb97        1         1         1       54m

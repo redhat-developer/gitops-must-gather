@@ -1,0 +1,2 @@
+NAME                                           READY   STATUS    RESTARTS   AGE
+openshift-gitops-dex-server-56594c64b8-cnthv   1/1     Running   0          55m

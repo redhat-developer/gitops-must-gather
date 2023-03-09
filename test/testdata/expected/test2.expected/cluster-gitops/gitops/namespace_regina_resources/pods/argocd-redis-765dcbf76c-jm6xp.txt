@@ -1,0 +1,2 @@
+NAME                            READY   STATUS    RESTARTS   AGE
+argocd-redis-765dcbf76c-jm6xp   1/1     Running   0          54m

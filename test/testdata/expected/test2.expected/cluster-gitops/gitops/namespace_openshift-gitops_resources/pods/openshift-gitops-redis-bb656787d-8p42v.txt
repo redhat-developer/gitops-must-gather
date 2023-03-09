@@ -1,0 +1,2 @@
+NAME                                     READY   STATUS    RESTARTS   AGE
+openshift-gitops-redis-bb656787d-8p42v   1/1     Running   0          55m

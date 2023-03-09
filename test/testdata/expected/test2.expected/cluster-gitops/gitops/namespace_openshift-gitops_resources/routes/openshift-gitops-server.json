@@ -1,0 +1,62 @@
+{
+    "apiVersion": "route.openshift.io/v1",
+    "kind": "Route",
+    "metadata": {
+        "annotations": {
+            "openshift.io/host.generated": "true"
+        },
+        "creationTimestamp": "2023-03-06T20:00:52Z",
+        "labels": {
+            "app.kubernetes.io/managed-by": "openshift-gitops",
+            "app.kubernetes.io/name": "openshift-gitops-server",
+            "app.kubernetes.io/part-of": "argocd"
+        },
+        "name": "openshift-gitops-server",
+        "namespace": "openshift-gitops",
+        "ownerReferences": [
+            {
+                "apiVersion": "argoproj.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ArgoCD",
+                "name": "openshift-gitops",
+                "uid": "6f84ba67-afc2-4a8a-a183-cb61ad300aa9"
+            }
+        ],
+        "resourceVersion": "680718",
+        "uid": "ce62809e-39fd-410c-b7cc-9eb95d3a90df"
+    },
+    "spec": {
+        "host": "openshift-gitops-server-openshift-gitops.apps.rhoms-4.13-030604.dev.openshiftappsvc.org",
+        "port": {
+            "targetPort": "https"
+        },
+        "tls": {
+            "insecureEdgeTerminationPolicy": "Redirect",
+            "termination": "passthrough"
+        },
+        "to": {
+            "kind": "Service",
+            "name": "openshift-gitops-server",
+            "weight": 100
+        },
+        "wildcardPolicy": "None"
+    },
+    "status": {
+        "ingress": [
+            {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2023-03-06T20:00:52Z",
+                        "status": "True",
+                        "type": "Admitted"
+                    }
+                ],
+                "host": "openshift-gitops-server-openshift-gitops.apps.rhoms-4.13-030604.dev.openshiftappsvc.org",
+                "routerCanonicalHostname": "router-default.apps.rhoms-4.13-030604.dev.openshiftappsvc.org",
+                "routerName": "default",
+                "wildcardPolicy": "None"
+            }
+        ]
+    }
+}

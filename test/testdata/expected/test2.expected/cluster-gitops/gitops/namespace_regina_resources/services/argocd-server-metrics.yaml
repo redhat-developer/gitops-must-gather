@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2023-03-06T20:03:18Z"
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/name: argocd-server-metrics
+    app.kubernetes.io/part-of: argocd
+  name: argocd-server-metrics
+  namespace: regina
+  ownerReferences:
+  - apiVersion: argoproj.io/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ArgoCD
+    name: argocd
+    uid: 7f0f337d-5072-48b6-af9a-2c90a74656dd
+  resourceVersion: "683806"
+  uid: 8d683a02-6b08-4841-a331-0248cdac8584
+spec:
+  clusterIP: 172.30.229.28
+  clusterIPs:
+  - 172.30.229.28
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: metrics
+    port: 8083
+    protocol: TCP
+    targetPort: 8083
+  selector:
+    app.kubernetes.io/name: argocd-server
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

@@ -1,0 +1,54 @@
+{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "creationTimestamp": "2023-03-06T20:03:18Z",
+        "labels": {
+            "app.kubernetes.io/component": "redis",
+            "app.kubernetes.io/managed-by": "argocd",
+            "app.kubernetes.io/name": "argocd-redis",
+            "app.kubernetes.io/part-of": "argocd"
+        },
+        "name": "argocd-redis",
+        "namespace": "regina",
+        "ownerReferences": [
+            {
+                "apiVersion": "argoproj.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ArgoCD",
+                "name": "argocd",
+                "uid": "7f0f337d-5072-48b6-af9a-2c90a74656dd"
+            }
+        ],
+        "resourceVersion": "683797",
+        "uid": "86cae4e3-e2de-4fa4-a212-ef3797d68a9e"
+    },
+    "spec": {
+        "clusterIP": "172.30.55.193",
+        "clusterIPs": [
+            "172.30.55.193"
+        ],
+        "internalTrafficPolicy": "Cluster",
+        "ipFamilies": [
+            "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "ports": [
+            {
+                "name": "tcp-redis",
+                "port": 6379,
+                "protocol": "TCP",
+                "targetPort": 6379
+            }
+        ],
+        "selector": {
+            "app.kubernetes.io/name": "argocd-redis"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}

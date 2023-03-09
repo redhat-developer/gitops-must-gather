@@ -1,0 +1,234 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "openshift-sdn",
+          "interface": "eth0",
+          "ips": [
+              "10.131.0.64"
+          ],
+          "default": true,
+          "dns": {}
+      }]
+    k8s.v1.cni.cncf.io/networks-status: |-
+      [{
+          "name": "openshift-sdn",
+          "interface": "eth0",
+          "ips": [
+              "10.131.0.64"
+          ],
+          "default": true,
+          "dns": {}
+      }]
+    openshift.io/scc: restricted-v2
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+  creationTimestamp: "2023-03-06T20:00:52Z"
+  generateName: openshift-gitops-dex-server-56594c64b8-
+  labels:
+    app.kubernetes.io/name: openshift-gitops-dex-server
+    dex.config.changed: 03062023-200023-UTC
+    pod-template-hash: 56594c64b8
+  name: openshift-gitops-dex-server-56594c64b8-cnthv
+  namespace: openshift-gitops
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: openshift-gitops-dex-server-56594c64b8
+    uid: 0a6c6e4c-26bb-48cf-95d8-82dec39631ae
+  resourceVersion: "681948"
+  uid: 6ea1341e-53b9-4f64-9727-0944112ce319
+spec:
+  containers:
+  - command:
+    - /shared/argocd-dex
+    - rundex
+    image: registry.redhat.io/openshift-gitops-1/dex-rhel8@sha256:185d4c4584e0a891f99f461ba4554e948e4ec2c1cabeffc99e0c9d84e4cdc374
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /healthz/live
+        port: 5558
+        scheme: HTTP
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 1
+    name: dex
+    ports:
+    - containerPort: 5556
+      name: http
+      protocol: TCP
+    - containerPort: 5557
+      name: grpc
+      protocol: TCP
+    - containerPort: 5558
+      name: metrics
+      protocol: TCP
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1000720000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /shared
+      name: static-files
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-fv6fg
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  imagePullSecrets:
+  - name: openshift-gitops-argocd-dex-server-dockercfg-rrjd7
+  initContainers:
+  - command:
+    - cp
+    - -n
+    - /usr/local/bin/argocd
+    - /shared/argocd-dex
+    image: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    imagePullPolicy: Always
+    name: copyutil
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1000720000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /shared
+      name: static-files
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-fv6fg
+      readOnly: true
+  nodeName: ip-10-0-181-109.us-east-2.compute.internal
+  nodeSelector:
+    kubernetes.io/os: linux
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext:
+    fsGroup: 1000720000
+    seLinuxOptions:
+      level: s0:c27,c9
+    seccompProfile:
+      type: RuntimeDefault
+  serviceAccount: openshift-gitops-argocd-dex-server
+  serviceAccountName: openshift-gitops-argocd-dex-server
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoSchedule
+    key: node.kubernetes.io/memory-pressure
+    operator: Exists
+  volumes:
+  - emptyDir: {}
+    name: static-files
+  - name: kube-api-access-fv6fg
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+      - configMap:
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: openshift-service-ca.crt
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-03-06T20:01:23Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-03-06T20:01:29Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-03-06T20:01:29Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-03-06T20:00:52Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: cri-o://35e5f85d6e329fe166ce885c85644d5c2ce5f062b9fcde3dd922fcfc724d90a4
+    image: registry.redhat.io/openshift-gitops-1/dex-rhel8@sha256:185d4c4584e0a891f99f461ba4554e948e4ec2c1cabeffc99e0c9d84e4cdc374
+    imageID: registry.redhat.io/openshift-gitops-1/dex-rhel8@sha256:185d4c4584e0a891f99f461ba4554e948e4ec2c1cabeffc99e0c9d84e4cdc374
+    lastState: {}
+    name: dex
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2023-03-06T20:01:28Z"
+  hostIP: 10.0.181.109
+  initContainerStatuses:
+  - containerID: cri-o://aead7a40608d4cb038f5c2dfe58d7e0d762de983c93b31ebc6bded6dbd4364ba
+    image: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    imageID: registry.redhat.io/openshift-gitops-1/argocd-rhel8@sha256:3a0f7d98d98ae8fb3ab53506577e9647130e55c900952ed751ce08ef727a682f
+    lastState: {}
+    name: copyutil
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: cri-o://aead7a40608d4cb038f5c2dfe58d7e0d762de983c93b31ebc6bded6dbd4364ba
+        exitCode: 0
+        finishedAt: "2023-03-06T20:01:22Z"
+        reason: Completed
+        startedAt: "2023-03-06T20:01:22Z"
+  phase: Running
+  podIP: 10.131.0.64
+  podIPs:
+  - ip: 10.131.0.64
+  qosClass: Burstable
+  startTime: "2023-03-06T20:00:52Z"

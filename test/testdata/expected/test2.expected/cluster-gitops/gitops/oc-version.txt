@@ -1,0 +1,4 @@
+Client Version: 4.13.0-202301140307.p0.ga0c13fc.assembly.stream-a0c13fc
+Kustomize Version: v4.5.7
+Server Version: 4.13.0-ec.2
+Kubernetes Version: v1.25.2+7dab57f

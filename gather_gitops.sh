@@ -111,7 +111,7 @@ exit_if_not_openshift() {
   fi
 }
 
-function getNamespaces() {
+get_namespaces() {
   local namespaces
   local default="openshift-gitops"
   local clusterScopedInstances
@@ -126,8 +126,8 @@ function getNamespaces() {
       namespaces="${clusterScopedInstances} ${default}"
     fi
   else 
-    mkdir -p "$GITOPS_DIR"
-    echo "Error: getNamespaces- No gitops instances found, please check your cluster configuration." > "${GITOPS_DIR}"/must-gather-script-errors.yaml 2>&1
+    mkdir -p $1
+    echo "Error: get_namespaces- No gitops instances found, please check your cluster configuration." > $1/must-gather-script-errors.yaml 2>&1
   fi
 
   local argocdInstances
@@ -251,7 +251,7 @@ get_events(){
   run_and_log "oc get events -n $1" "$2/all-events.txt"
 }
 
-function main() {
+function main_function() {
 
   # Initialize the directory where the must-gather data will be stored and the error log file
   echo "Starting GitOps Operator must-gather script..."
@@ -267,7 +267,7 @@ function main() {
   exit_if_not_openshift
 
   echo " * Checking for GitOps Namespaces..."
-  getNamespaces
+  get_namespaces "$GITOPS_DIR"
 
   echo " * Getting OpenShift Cluster Version..."
   run_and_log "oc version" "$GITOPS_DIR/oc-version.txt"
@@ -401,24 +401,53 @@ function main() {
   echo "Done! Thank you for using the GitOps must-gather tool :)"
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  # The script is being executed as a script
+  # Call the desired function here
+  main_function
+else
+  # The script is being sourced as a library
+  # Define the main function here
+  function main() {
+    # Call the supporting functions here
+    create_directory
+    run_and_log
+    exit_if_binary_not_installed
+    exit_if_not_openshift
+    get_applications
+    get_applicationSets
+    get_argocds
+    get_deployments
+    get_events
+    get_namespaces
+    get_pods
+    get_replicaSets
+    get_routes
+    get_services
+    get_statefulSets
+  }
+  # Call the main function here if the script is being executed as a script
+  main "$@"
+fi
+
+# main "$@"
 echo
 echo
 if [ $ERROR_COUNTER -gt 0 ]; then
-    echo "There were $ERROR_COUNTER errors"
-    echo "Please check the error log file for more details: $ERROR_LOG"
+  echo "There were $ERROR_COUNTER errors"
+  echo "Please check the error log file for more details: $ERROR_LOG"
 else
-    echo "All commands executed successfully!"
-    if [ $NO_OUTPUT_COUNTER -gt 0 ]; then
-        echo " * NOTE: $NO_OUTPUT_COUNTER commands did not produce any output (see: $NO_OUTPUT_LOG)"
-    fi
-    echo "You can find all the commands that were executed in the log file: $ALL_COMMANDS_LOG"
-    exit 0
+  echo "All commands executed successfully!"
+  if [ $NO_OUTPUT_COUNTER -gt 0 ]; then
+      echo " * NOTE: $NO_OUTPUT_COUNTER commands did not produce any output (see: $NO_OUTPUT_LOG)"
+  fi
+  echo "You can find all the commands that were executed in the log file: $ALL_COMMANDS_LOG"
+  exit 0
 fi
 
 echo "All other commands were successfully executed!"
 if [ $NO_OUTPUT_COUNTER -gt 0 ]; then
   echo " * NOTE: $NO_OUTPUT_COUNTER commands did not produce any output (see: $NO_OUTPUT_LOG)"
-  fi
+fi
 echo "You can find all the commands that were executed in the log file: $ALL_COMMANDS_LOG"
 

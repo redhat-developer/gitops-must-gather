@@ -1,0 +1,2 @@
+NAME                      HOST/PORT                                                                                 PATH   SERVICES                  PORT    TERMINATION            WILDCARD
+openshift-gitops-server   openshift-gitops-server-openshift-gitops.apps.rhoms-4.13-030604.dev.openshiftappsvc.org          openshift-gitops-server   https   passthrough/Redirect   None

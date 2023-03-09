@@ -1,0 +1,2 @@
+NAME                                        READY   STATUS    RESTARTS   AGE
+openshift-gitops-application-controller-0   1/1     Running   0          55m

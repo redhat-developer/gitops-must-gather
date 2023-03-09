@@ -1,0 +1,6 @@
+oc get applications.argoproj.io -n openshift-gitops
+oc get applicationsets.argoproj.io -n openshift-gitops
+oc get events -n openshift-gitops --field-selector type=Error
+oc get namespaces --selector=argocd.argoproj.io/managed-by=openshift-gitops
+oc get events -n regina --field-selector type=Error
+oc get namespaces --selector=argocd.argoproj.io/managed-by=regina

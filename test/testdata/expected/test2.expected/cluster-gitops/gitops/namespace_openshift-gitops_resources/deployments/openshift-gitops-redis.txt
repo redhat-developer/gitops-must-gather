@@ -1,0 +1,2 @@
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+openshift-gitops-redis   1/1     1            1           56m

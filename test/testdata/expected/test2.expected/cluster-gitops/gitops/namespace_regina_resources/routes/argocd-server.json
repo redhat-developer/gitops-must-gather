@@ -1,0 +1,62 @@
+{
+    "apiVersion": "route.openshift.io/v1",
+    "kind": "Route",
+    "metadata": {
+        "annotations": {
+            "openshift.io/host.generated": "true"
+        },
+        "creationTimestamp": "2023-03-06T20:03:18Z",
+        "labels": {
+            "app.kubernetes.io/managed-by": "argocd",
+            "app.kubernetes.io/name": "argocd-server",
+            "app.kubernetes.io/part-of": "argocd"
+        },
+        "name": "argocd-server",
+        "namespace": "regina",
+        "ownerReferences": [
+            {
+                "apiVersion": "argoproj.io/v1alpha1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "ArgoCD",
+                "name": "argocd",
+                "uid": "7f0f337d-5072-48b6-af9a-2c90a74656dd"
+            }
+        ],
+        "resourceVersion": "683861",
+        "uid": "872595b0-186f-4d6b-af60-7820d491df1f"
+    },
+    "spec": {
+        "host": "argocd-server-regina.apps.rhoms-4.13-030604.dev.openshiftappsvc.org",
+        "port": {
+            "targetPort": "https"
+        },
+        "tls": {
+            "insecureEdgeTerminationPolicy": "Redirect",
+            "termination": "passthrough"
+        },
+        "to": {
+            "kind": "Service",
+            "name": "argocd-server",
+            "weight": 100
+        },
+        "wildcardPolicy": "None"
+    },
+    "status": {
+        "ingress": [
+            {
+                "conditions": [
+                    {
+                        "lastTransitionTime": "2023-03-06T20:03:19Z",
+                        "status": "True",
+                        "type": "Admitted"
+                    }
+                ],
+                "host": "argocd-server-regina.apps.rhoms-4.13-030604.dev.openshiftappsvc.org",
+                "routerCanonicalHostname": "router-default.apps.rhoms-4.13-030604.dev.openshiftappsvc.org",
+                "routerName": "default",
+                "wildcardPolicy": "None"
+            }
+        ]
+    }
+}

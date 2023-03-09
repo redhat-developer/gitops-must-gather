@@ -1,0 +1,2 @@
+NAME                          TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)             AGE
+openshift-gitops-dex-server   ClusterIP   172.30.11.77   <none>        5556/TCP,5557/TCP   56m
