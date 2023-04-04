@@ -1,2 +1,0 @@
-NAME                      READY   UP-TO-DATE   AVAILABLE   AGE
-openshift-gitops-server   1/1     1            1           56m

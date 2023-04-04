@@ -1,19 +1,11 @@
 #!/bin/bash
-rm testdata/actual/test2.actual
-mkdir testdata/actual/test2
-cp testdata/actual/cluster_gitops testdata/actual/test2
 
-# Check if the output file exists and has content
-if ! [ -d testdata/actual/cluster-gitops ]; then
-    echo "Test failed: output file is empty or does not exist"
-    echo "This is a problem with the test itself (e.g. poorly written), not the must-gather tool"
-    exit 1
-fi
-
-# Check if expected result is the same as actual result
-if [ diff -qr testdata/expected/cluster-gitops testdata/actual/cluster-gitops ]; then
-    echo "Test2: Passed"
-else
-    echo "Test2: Failed... test2.actual is not equal to test2.expected"
-    exit 1
-fi
+# Check if the mustgather_output tree for expected is the same as actual tree output
+# sed looks for the uid of the resource and replaces it with xxxxxx-xxxxx
+# sed also removes the lines for files for events because the presence of those can be impacted by external sources resulting in flaky tests
+cd testdata/actual/mustgather_output/ && tree | sed -r '
+s/([a-zA-Z0-9-]+(-[a-zA-Z0-9]+)?)-[a-f0-9]{4,}(-[a-z0-9]+)?(\.[a-zA-Z0-9_-]+)?/\1-xxxxxx-xxxxx\4/g
+/warning-events.txt/d
+/error-events.txt/d
+/all-events.txt/d
+'

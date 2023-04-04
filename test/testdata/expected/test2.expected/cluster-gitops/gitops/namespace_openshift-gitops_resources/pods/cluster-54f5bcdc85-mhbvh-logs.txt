@@ -1,2 +1,0 @@
-2023/03/06 20:00:59 listening on :8080
-2023/03/06 20:00:59 Using TLS from "/etc/gitops/ssl/tls.crt" and "/etc/gitops/ssl/tls.key"

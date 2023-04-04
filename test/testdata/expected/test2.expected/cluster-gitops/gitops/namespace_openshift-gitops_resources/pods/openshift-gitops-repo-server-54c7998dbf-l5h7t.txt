@@ -1,2 +1,0 @@
-NAME                                            READY   STATUS    RESTARTS   AGE
-openshift-gitops-repo-server-54c7998dbf-l5h7t   1/1     Running   0          55m

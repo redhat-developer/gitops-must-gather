@@ -1,3 +1,0 @@
-NAMESPACE          NAME      AGE
-openshift-gitops   default   56m
-regina             default   54m

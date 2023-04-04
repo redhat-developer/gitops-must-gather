@@ -1,2 +1,0 @@
-NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-argocd-redis   ClusterIP   172.30.55.193   <none>        6379/TCP   54m

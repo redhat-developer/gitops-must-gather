@@ -1,9 +1,0 @@
-NAME                                                    DESIRED   CURRENT   READY   AGE
-cluster-54f5bcdc85                                      1         1         1       56m
-kam-7d7bfc8675                                          1         1         1       56m
-openshift-gitops-applicationset-controller-5cf7bb9dbc   1         1         1       56m
-openshift-gitops-dex-server-56594c64b8                  1         1         1       56m
-openshift-gitops-dex-server-6474776566                  0         0         0       56m
-openshift-gitops-redis-bb656787d                        1         1         1       56m
-openshift-gitops-repo-server-54c7998dbf                 1         1         1       56m
-openshift-gitops-server-786849cbb8                      1         1         1       56m

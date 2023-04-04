@@ -1,2 +1,0 @@
-NAME                                 DESIRED   CURRENT   READY   AGE
-openshift-gitops-server-786849cbb8   1         1         1       56m

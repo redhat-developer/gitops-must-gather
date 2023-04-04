@@ -1,6 +1,0 @@
-NAME                                    CREATED AT
-applications.argoproj.io                2023-03-06T20:00:32Z
-applicationsets.argoproj.io             2023-03-06T20:00:32Z
-appprojects.argoproj.io                 2023-03-06T20:00:32Z
-argocds.argoproj.io                     2023-03-06T20:00:32Z
-gitopsservices.pipelines.openshift.io   2023-03-06T20:00:34Z

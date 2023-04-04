@@ -1,2 +1,0 @@
-NAME                               DESIRED   CURRENT   READY   AGE
-openshift-gitops-redis-bb656787d   1         1         1       56m

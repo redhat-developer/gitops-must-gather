@@ -1,2 +1,0 @@
-NAME      VERSION       AVAILABLE   PROGRESSING   SINCE   STATUS
-version   4.13.0-ec.2   True        False         15h     Cluster version is 4.13.0-ec.2

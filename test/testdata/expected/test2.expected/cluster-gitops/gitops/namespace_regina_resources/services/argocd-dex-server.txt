@@ -1,2 +1,0 @@
-NAME                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
-argocd-dex-server   ClusterIP   172.30.137.175   <none>        5556/TCP,5557/TCP   54m

@@ -1,2 +1,0 @@
-NAME      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-cluster   ClusterIP   172.30.219.37   <none>        8080/TCP   56m

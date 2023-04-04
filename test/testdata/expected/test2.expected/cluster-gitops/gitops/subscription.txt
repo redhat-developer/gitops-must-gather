@@ -1,2 +1,0 @@
-NAME                        PACKAGE                     SOURCE             CHANNEL
-openshift-gitops-operator   openshift-gitops-operator   redhat-operators   latest

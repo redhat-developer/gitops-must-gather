@@ -1,2 +1,0 @@
-NAME   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
-kam    ClusterIP   172.30.247.121   <none>        8080/TCP,8443/TCP   56m

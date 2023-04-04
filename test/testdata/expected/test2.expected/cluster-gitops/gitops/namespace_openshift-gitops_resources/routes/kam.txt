@@ -1,2 +1,0 @@
-NAME   HOST/PORT                                                             PATH   SERVICES   PORT   TERMINATION        WILDCARD
-kam    kam-openshift-gitops.apps.rhoms-4.13-030604.dev.openshiftappsvc.org          kam        8443   passthrough/None   None

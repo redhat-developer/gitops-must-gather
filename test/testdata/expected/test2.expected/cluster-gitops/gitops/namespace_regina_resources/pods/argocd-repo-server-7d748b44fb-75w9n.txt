@@ -1,2 +1,0 @@
-NAME                                  READY   STATUS    RESTARTS   AGE
-argocd-repo-server-7d748b44fb-75w9n   1/1     Running   0          54m

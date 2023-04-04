@@ -1,2 +1,0 @@
-Red Hat OpenShift GitOps
-1.7.2

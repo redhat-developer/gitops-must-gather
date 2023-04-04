@@ -1,2 +1,0 @@
-NAME      READY   UP-TO-DATE   AVAILABLE   AGE
-cluster   1/1     1            1           55m

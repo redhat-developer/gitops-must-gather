@@ -1,2 +1,0 @@
-NAME                      DESIRED   CURRENT   READY   AGE
-argocd-redis-765dcbf76c   1         1         1       54m

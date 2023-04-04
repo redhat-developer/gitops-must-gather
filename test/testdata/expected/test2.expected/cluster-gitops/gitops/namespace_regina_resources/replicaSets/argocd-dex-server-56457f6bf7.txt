@@ -1,2 +1,0 @@
-NAME                           DESIRED   CURRENT   READY   AGE
-argocd-dex-server-56457f6bf7   0         0         0       54m

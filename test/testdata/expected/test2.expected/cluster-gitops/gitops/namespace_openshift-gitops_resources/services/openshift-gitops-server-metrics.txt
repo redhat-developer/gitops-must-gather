@@ -1,2 +1,0 @@
-NAME                              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
-openshift-gitops-server-metrics   ClusterIP   172.30.11.47   <none>        8083/TCP   56m

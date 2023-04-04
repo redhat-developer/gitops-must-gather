@@ -1,2 +1,0 @@
-LAST SEEN   TYPE      REASON        OBJECT                         MESSAGE
-56m         Warning   FailedMount   pod/cluster-54f5bcdc85-mhbvh   MountVolume.SetUp failed for volume "backend-ssl" : secret "cluster" not found

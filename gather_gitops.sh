@@ -126,7 +126,7 @@ get_namespaces() {
       namespaces="${clusterScopedInstances} ${default}"
     fi
   else 
-    mkdir -p $1
+    mkdir -p "$GITOPS_DIR"
     echo "Error: get_namespaces- No gitops instances found, please check your cluster configuration." > $1/must-gather-script-errors.yaml 2>&1
   fi
 
@@ -251,7 +251,7 @@ get_events(){
   run_and_log "oc get events -n $1" "$2/all-events.txt"
 }
 
-function main_function() {
+function main() {
 
   # Initialize the directory where the must-gather data will be stored and the error log file
   echo "Starting GitOps Operator must-gather script..."
@@ -267,7 +267,7 @@ function main_function() {
   exit_if_not_openshift
 
   echo " * Checking for GitOps Namespaces..."
-  get_namespaces "$GITOPS_DIR"
+  get_namespaces
 
   echo " * Getting OpenShift Cluster Version..."
   run_and_log "oc version" "$GITOPS_DIR/oc-version.txt"
@@ -401,36 +401,7 @@ function main_function() {
   echo "Done! Thank you for using the GitOps must-gather tool :)"
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  # The script is being executed as a script
-  # Call the desired function here
-  main_function
-else
-  # The script is being sourced as a library
-  # Define the main function here
-  function main() {
-    # Call the supporting functions here
-    create_directory
-    run_and_log
-    exit_if_binary_not_installed
-    exit_if_not_openshift
-    get_applications
-    get_applicationSets
-    get_argocds
-    get_deployments
-    get_events
-    get_namespaces
-    get_pods
-    get_replicaSets
-    get_routes
-    get_services
-    get_statefulSets
-  }
-  # Call the main function here if the script is being executed as a script
-  main "$@"
-fi
-
-# main "$@"
+main "$@"
 echo
 echo
 if [ $ERROR_COUNTER -gt 0 ]; then

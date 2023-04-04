@@ -1,8 +1,0 @@
-NAME                                         READY   UP-TO-DATE   AVAILABLE   AGE
-cluster                                      1/1     1            1           55m
-kam                                          1/1     1            1           55m
-openshift-gitops-applicationset-controller   1/1     1            1           55m
-openshift-gitops-dex-server                  1/1     1            1           55m
-openshift-gitops-redis                       1/1     1            1           55m
-openshift-gitops-repo-server                 1/1     1            1           55m
-openshift-gitops-server                      1/1     1            1           55m

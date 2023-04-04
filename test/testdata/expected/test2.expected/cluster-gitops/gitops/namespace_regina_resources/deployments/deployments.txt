@@ -1,5 +1,0 @@
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-argocd-dex-server    1/1     1            1           54m
-argocd-redis         1/1     1            1           54m
-argocd-repo-server   1/1     1            1           54m
-argocd-server        1/1     1            1           54m
