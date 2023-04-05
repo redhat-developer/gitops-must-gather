@@ -100,7 +100,7 @@ done
 echo
 echo
 echo
-if [ $FAILED_TESTS -eq 0 ]; then
+if [ "$FAILED_TESTS" -eq 0 ]; then
     echo -e "${COLOR_GREEN}Test suite successfully completed without errors!${COLOR_RESET}"
 else
     echo -e "${COLOR_RED}Testing failed. $FAILED_TESTS test(s) failed.${COLOR_RESET}"
