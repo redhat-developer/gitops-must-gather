@@ -127,7 +127,7 @@ get_namespaces() {
     fi
   else 
     mkdir -p "$GITOPS_DIR"
-    echo "Error: get_namespaces- No gitops instances found, please check your cluster configuration." > $1/must-gather-script-errors.yaml 2>&1
+    echo "Error: get_namespaces- No gitops instances found, please check your cluster configuration." > "$GITOPS_DIR"/must-gather-script-errors.yaml 2>&1
   fi
 
   local argocdInstances
