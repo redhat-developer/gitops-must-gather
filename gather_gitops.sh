@@ -111,7 +111,7 @@ exit_if_not_openshift() {
   fi
 }
 
-function getNamespaces() {
+get_namespaces() {
   local namespaces
   local default="openshift-gitops"
   local clusterScopedInstances
@@ -127,7 +127,7 @@ function getNamespaces() {
     fi
   else 
     mkdir -p "$GITOPS_DIR"
-    echo "Error: getNamespaces- No gitops instances found, please check your cluster configuration." > "${GITOPS_DIR}"/must-gather-script-errors.yaml 2>&1
+    echo "Error: get_namespaces- No gitops instances found, please check your cluster configuration." > "$GITOPS_DIR"/must-gather-script-errors.yaml 2>&1
   fi
 
   local argocdInstances
@@ -267,7 +267,7 @@ function main() {
   exit_if_not_openshift
 
   echo " * Checking for GitOps Namespaces..."
-  getNamespaces
+  get_namespaces
 
   echo " * Getting OpenShift Cluster Version..."
   run_and_log "oc version" "$GITOPS_DIR/oc-version.txt"
@@ -405,20 +405,20 @@ main "$@"
 echo
 echo
 if [ $ERROR_COUNTER -gt 0 ]; then
-    echo "There were $ERROR_COUNTER errors"
-    echo "Please check the error log file for more details: $ERROR_LOG"
+  echo "There were $ERROR_COUNTER errors"
+  echo "Please check the error log file for more details: $ERROR_LOG"
 else
-    echo "All commands executed successfully!"
-    if [ $NO_OUTPUT_COUNTER -gt 0 ]; then
-        echo " * NOTE: $NO_OUTPUT_COUNTER commands did not produce any output (see: $NO_OUTPUT_LOG)"
-    fi
-    echo "You can find all the commands that were executed in the log file: $ALL_COMMANDS_LOG"
-    exit 0
+  echo "All commands executed successfully!"
+  if [ $NO_OUTPUT_COUNTER -gt 0 ]; then
+      echo " * NOTE: $NO_OUTPUT_COUNTER commands did not produce any output (see: $NO_OUTPUT_LOG)"
+  fi
+  echo "You can find all the commands that were executed in the log file: $ALL_COMMANDS_LOG"
+  exit 0
 fi
 
 echo "All other commands were successfully executed!"
 if [ $NO_OUTPUT_COUNTER -gt 0 ]; then
   echo " * NOTE: $NO_OUTPUT_COUNTER commands did not produce any output (see: $NO_OUTPUT_LOG)"
-  fi
+fi
 echo "You can find all the commands that were executed in the log file: $ALL_COMMANDS_LOG"
 
