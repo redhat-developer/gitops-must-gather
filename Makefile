@@ -60,3 +60,6 @@ push: image ## Push the image to the container registry
 
 clean: check-docker-podman ## Clean up the built image
 	${DOCKER_OR_PODMAN} rmi ${CONTAINER_IMAGE_LINK}
+
+test: test-unit
+	./test/suite.sh
