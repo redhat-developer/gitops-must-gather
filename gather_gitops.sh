@@ -111,13 +111,28 @@ exit_if_not_openshift() {
   fi
 }
 
+get_subscription_namespace() {
+  local namespace1="openshift-operators"
+  local namespace2="openshift-gitops-operator"
+  if [[ "$(oc get subs openshift-gitops-operator -n ${namespace1})" ]]; then
+    SUBS_NS="$namespace1"
+  elif [[ "$(oc get subs openshift-gitops-operator -n ${namespace2})" ]]; then
+    SUBS_NS="$namespace2"
+  else 
+    mkdir -p "$GITOPS_DIR"
+    echo "Error: get_subscription_namespace - No GitOps Operator subscription found, please check your cluster configuration." > "$GITOPS_DIR"/must-gather-script-errors.yaml 2>&1
+  fi
+  
+  export SUBS_NS
+}
+
 get_namespaces() {
   local namespaces
   local default="openshift-gitops"
   local clusterScopedInstances
-  clusterScopedInstances=$(oc get subs openshift-gitops-operator -n openshift-operators -o json | jq '.spec.config.env[]?|select(.name=="ARGOCD_CLUSTER_CONFIG_NAMESPACES").value' | tr -d '",')
-  disableDefaultArgoCDInstanceValue=$(oc get subs openshift-gitops-operator -n openshift-operators -o json | jq '.spec.config.env[]?|select(.name=="DISABLE_DEFAULT_ARGOCD_INSTANCE").value')
-  if [[ "$(oc get subs openshift-gitops-operator -n openshift-operators -o jsonpath='{.spec.config.env}')" == "" ]]; then
+  clusterScopedInstances=$(oc get subs openshift-gitops-operator -n "${SUBS_NS}" -o json | jq '.spec.config.env[]?|select(.name=="ARGOCD_CLUSTER_CONFIG_NAMESPACES").value' | tr -d '",')
+  disableDefaultArgoCDInstanceValue=$(oc get subs openshift-gitops-operator -n "${SUBS_NS}" -o json | jq '.spec.config.env[]?|select(.name=="DISABLE_DEFAULT_ARGOCD_INSTANCE").value')
+  if [[ "$(oc get subs openshift-gitops-operator -n "${SUBS_NS}" -o jsonpath='{.spec.config.env}')" == "" ]]; then
     namespaces="${default}"
   elif [[ "${clusterScopedInstances}" != "" ]]; then
     if [[ "${disableDefaultArgoCDInstanceValue}" == "true" ]]; then
@@ -266,6 +281,9 @@ function main() {
   echo " * Checking if the current cluster is an OpenShift cluster..."
   exit_if_not_openshift
 
+  echo " * Checking if the GitOps Operator is installed..."
+  get_subscription_namespace
+
   echo " * Checking for GitOps Namespaces..."
   get_namespaces
 
@@ -278,9 +296,9 @@ function main() {
   oc -n openshift-gitops get "${csv_name}" -o jsonpath='{.spec.displayName}{"\n"}{.spec.version}' > "$GITOPS_DIR/version.txt"
 
   echo " * Getting GitOps Operator Subscription..."
-  run_and_log "oc get subs openshift-gitops-operator -n openshift-operators -o yaml" "$GITOPS_DIR/subscription.yaml"
-  run_and_log "oc get subs openshift-gitops-operator -n openshift-operators -o json" "$GITOPS_DIR/subscription.json"
-  run_and_log "oc get subs openshift-gitops-operator -n openshift-operators" "$GITOPS_DIR/subscription.txt"
+  run_and_log "oc get subs openshift-gitops-operator -n ${SUBS_NS} -o yaml" "$GITOPS_DIR/subscription.yaml"
+  run_and_log "oc get subs openshift-gitops-operator -n ${SUBS_NS} -o json" "$GITOPS_DIR/subscription.json"
+  run_and_log "oc get subs openshift-gitops-operator -n ${SUBS_NS}" "$GITOPS_DIR/subscription.txt"
 
   for namespace in ${NAMESPACES}; do
     RESOURCES_DIR="${GITOPS_DIR}/namespace_${namespace}_resources"
@@ -393,9 +411,9 @@ function main() {
   echo " * Getting GitOps CRDs from all Namespaces..."
   CRD_DIR="${GITOPS_DIR}/crds"
   create_directory "${CRD_DIR}"
-  run_and_log "oc get crds -l operators.coreos.com/openshift-gitops-operator.openshift-operators" "${CRD_DIR}/crds.txt"
-  run_and_log "oc get crds -l operators.coreos.com/openshift-gitops-operator.openshift-operators -o yaml" "${CRD_DIR}/crds.yaml"
-  run_and_log "oc get crds -l operators.coreos.com/openshift-gitops-operator.openshift-operators -o json" "${CRD_DIR}/crds.json"
+  run_and_log "oc get crds -l operators.coreos.com/openshift-gitops-operator.${SUBS_NS}" "${CRD_DIR}/crds.txt"
+  run_and_log "oc get crds -l operators.coreos.com/openshift-gitops-operator.${SUBS_NS} -o yaml" "${CRD_DIR}/crds.yaml"
+  run_and_log "oc get crds -l operators.coreos.com/openshift-gitops-operator.${SUBS_NS} -o json" "${CRD_DIR}/crds.json"
 
   echo
   echo "Done! Thank you for using the GitOps must-gather tool :)"
