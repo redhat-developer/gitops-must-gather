@@ -266,6 +266,49 @@ get_events(){
   run_and_log "oc get events -n $1" "$2/all-events.txt"
 }
 
+# gets get_rollouts_manager_cr; takes namespace and directory as argument
+get_rollouts_manager_cr() {
+  echo " * Getting Rollouts Manager CR contents in $1..."
+  run_and_log "oc -n $1 get rolloutmanager" "$2/rollouts-manager-cr.txt"
+  run_and_log "oc -n $1 get rolloutmanager -o yaml" "$2/rollouts-manager-cr.yaml"
+  run_and_log "oc -n $1 get rolloutmanager -o json" "$2/rollouts-manager-cr.json"
+}
+
+# gets get_rollouts_cr; takes namespace and directory as argument
+get_rollouts_cr() {
+  run_and_log "oc -n $1 get rollout" "$2/rollouts-cr.txt"
+  run_and_log "oc -n $1 get rollout -o yaml" "$2/rollouts-cr.yaml"
+  run_and_log "oc -n $1 get rollout -o json" "$2/rollouts-cr.json"
+}
+
+# gets get_rollout_deployments; takes namespace and directory as argument
+get_rollout_deployments(){
+  echo " * Getting rollout deployments in $1..."
+  local rolloutName
+  rolloutName="argo-rollouts"
+  run_and_log "oc -n $1 get deployment/${rolloutName}" "$2/rollout-deployments.txt"
+  run_and_log "oc -n $1 get deployment/${rolloutName} -o yaml" "$2/rollout-deployments.yaml"
+  run_and_log "oc -n $1 get deployment/${rolloutName} -o json" "$2/rollout-deployments.json"
+}
+
+# gets get_rollout_replicaSet; takes namespace and directory as argument
+get_rollout_replicaSet(){
+  echo " * Getting rollout replicaSet in $1..."
+  run_and_log "oc -n $1 get replicaset/argo-rollouts" "$2/rollout-replicaSet.txt"
+  run_and_log "oc -n $1 get replicaset/argo-rollouts -o yaml" "$2/rollout-replicaSet.yaml"
+  run_and_log "oc -n $1 get replicaset/argo-rollouts -o json" "$2/rollout-replicaSet.json"
+}
+
+# gets services; takes namespace and directory as argument
+get_rollout_services(){
+  echo " * Getting rollout services in $1..."
+  local rolloutName
+  rolloutName="argo-rollouts-metrics"
+  run_and_log "oc -n $1 get service/${rolloutName}" "$2/rollout-service.txt"
+  run_and_log "oc -n $1 get service/${rolloutName} -o yaml" "$2/rollout-service.yaml"
+  run_and_log "oc -n $1 get service/${rolloutName} -o json" "$2/rollout-service.json"
+}
+
 function main() {
 
   # Initialize the directory where the must-gather data will be stored and the error log file
@@ -336,6 +379,31 @@ function main() {
     create_directory "${APPLICATION_DIR}"
     get_applications "${namespace}" "${APPLICATION_DIR}"
 
+    # rollouts
+    echo "Creating directory for rollouts"
+    ROLLOUTS_DIR="${RESOURCES_DIR}/rollouts"
+    create_directory "${ROLLOUTS_DIR}"
+    
+    ROLLOUTS_MANAGER_CR_DIR="${ROLLOUTS_DIR}/manager_cr"
+    create_directory "${ROLLOUTS_MANAGER_CR_DIR}"
+    get_rollouts_manager_cr "${namespace}" "${ROLLOUTS_MANAGER_CR_DIR}"
+    
+    ROLLOUTS_CR_DIR="${ROLLOUTS_DIR}/cr"
+    create_directory "${ROLLOUTS_CR_DIR}"
+    get_rollouts_cr "${namespace}" "${ROLLOUTS_CR_DIR}"
+
+    ROLLOUTS_DEPLOYMENT_DIR="${ROLLOUTS_DIR}/rollout_deployment"
+    create_directory "${ROLLOUTS_DEPLOYMENT_DIR}"
+    get_rollout_deployments "${namespace}" "${ROLLOUTS_DEPLOYMENT_DIR}"
+
+    ROLLOUTS_REPLICASET_DIR="${ROLLOUTS_DIR}/rollout_replicaSet"
+    create_directory "${ROLLOUTS_REPLICASET_DIR}"
+    get_rollout_replicaSet "${namespace}" "${ROLLOUTS_REPLICASET_DIR}"
+
+    ROLLOUTS_SERVICES_DIR="${ROLLOUTS_DIR}/rollout_services"
+    create_directory "${ROLLOUTS_SERVICES_DIR}"
+    get_rollout_services "${namespace}" "${ROLLOUTS_SERVICES_DIR}"
+
     echo " * Getting ArgoCD Source Namespaces in ${namespace}..."
     local sourceNamespaces
     run_and_log "oc get argocd -n ${namespace} -o jsonpath='{.items[*].spec.sourceNamespaces[*]}'" "${ARGOCD_DIR}/sourceNamespaces.txt"
@@ -365,6 +433,11 @@ function main() {
     run_and_log "oc logs deployment/${argoCDName}-repo-server -n ${namespace}" "${ARGOCD_LOG_DIR}/repo-server-logs.txt"
     run_and_log "oc logs deployment/${argoCDName}-redis -n ${namespace}" "${ARGOCD_LOG_DIR}/redis-logs.txt"
     run_and_log "oc logs deployment/${argoCDName}-dex-server -n ${namespace}" "${ARGOCD_LOG_DIR}/dex-server-logs.txt"
+
+    echo " * Getting Rollout logs in ${namespace}..."
+    ROLLOUTS_LOG_DIR="${ROLLOUTS_DIR}/logs"
+    create_directory "${ROLLOUTS_LOG_DIR}"
+    run_and_log "oc logs  deployment/argo-rollouts -n ${namespace}" "${ROLLOUTS_LOG_DIR}/rollout-logs.txt"
   
     echo " * Getting ArgoCD Managed namespaces in ${namespace}..."
     run_and_log "oc get namespaces --selector=argocd.argoproj.io/managed-by=${namespace}" "${ARGOCD_DIR}/managed-namespaces.txt"
