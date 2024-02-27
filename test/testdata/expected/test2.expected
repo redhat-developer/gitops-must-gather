@@ -229,6 +229,28 @@
         │   │   ├── argocd-server-xxxxxx-xxxxx.txt
         │   │   ├── argocd-server-xxxxxx-xxxxx.yaml
         │   │   └── replicaSets.txt
+        │   ├── rollouts
+        │   │   ├── cr
+        │   │   │   ├── rollouts-cr.json
+        │   │   │   └── rollouts-cr.yaml
+        │   │   ├── logs
+        │   │   │   └── rollout-logs.txt
+        │   │   ├── manager_cr
+        │   │   │   ├── rollouts-manager-cr.json
+        │   │   │   ├── rollouts-manager-cr.txt
+        │   │   │   └── rollouts-manager-cr.yaml
+        │   │   ├── rollout_deployment
+        │   │   │   ├── rollout-deployments.json
+        │   │   │   ├── rollout-deployments.txt
+        │   │   │   └── rollout-deployments.yaml
+        │   │   ├── rollout_replicaSet
+        │   │   │   ├── rollout-replicaSet.json
+        │   │   │   ├── rollout-replicaSet.txt
+        │   │   │   └── rollout-replicaSet.yaml
+        │   │   └── rollout_services
+        │   │       ├── rollout-service.json
+        │   │       ├── rollout-service.txt
+        │   │       └── rollout-service.yaml
         │   ├── routes
         │   │   ├── argocd-server.json
         │   │   ├── argocd-server.txt
