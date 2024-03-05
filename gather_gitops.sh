@@ -148,8 +148,11 @@ get_namespaces() {
   local argocdInstances
   argocdInstances=$(oc get ArgoCD --all-namespaces -o jsonpath='{.items[*].metadata.namespace}')
 
+  local rolloutNamespaces
+  argocdInstances=$(oc get RolloutManager --all-namespaces -o jsonpath='{.items[*].metadata.namespace}')
+
   local total
-  total="${namespaces} ${argocdInstances}"
+  total="${namespaces} ${argocdInstances} ${rolloutNamespaces}"
   echo "${total}"
   
   NAMESPACES=$(echo "${total}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
