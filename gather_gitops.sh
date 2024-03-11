@@ -379,31 +379,6 @@ function main() {
     create_directory "${APPLICATION_DIR}"
     get_applications "${namespace}" "${APPLICATION_DIR}"
 
-    # rollouts
-    echo "Creating directory for rollouts"
-    ROLLOUTS_DIR="${RESOURCES_DIR}/rollouts"
-    create_directory "${ROLLOUTS_DIR}"
-    
-    ROLLOUTS_MANAGER_CR_DIR="${ROLLOUTS_DIR}/manager_cr"
-    create_directory "${ROLLOUTS_MANAGER_CR_DIR}"
-    get_rollouts_manager_cr "${namespace}" "${ROLLOUTS_MANAGER_CR_DIR}"
-    
-    ROLLOUTS_CR_DIR="${ROLLOUTS_DIR}/cr"
-    create_directory "${ROLLOUTS_CR_DIR}"
-    get_rollouts_cr "${namespace}" "${ROLLOUTS_CR_DIR}"
-
-    ROLLOUTS_DEPLOYMENT_DIR="${ROLLOUTS_DIR}/rollout_deployment"
-    create_directory "${ROLLOUTS_DEPLOYMENT_DIR}"
-    get_rollout_deployments "${namespace}" "${ROLLOUTS_DEPLOYMENT_DIR}"
-
-    ROLLOUTS_REPLICASET_DIR="${ROLLOUTS_DIR}/rollout_replicaSet"
-    create_directory "${ROLLOUTS_REPLICASET_DIR}"
-    get_rollout_replicaSet "${namespace}" "${ROLLOUTS_REPLICASET_DIR}"
-
-    ROLLOUTS_SERVICES_DIR="${ROLLOUTS_DIR}/rollout_services"
-    create_directory "${ROLLOUTS_SERVICES_DIR}"
-    get_rollout_services "${namespace}" "${ROLLOUTS_SERVICES_DIR}"
-
     echo " * Getting ArgoCD Source Namespaces in ${namespace}..."
     local sourceNamespaces
     run_and_log "oc get argocd -n ${namespace} -o jsonpath='{.items[*].spec.sourceNamespaces[*]}'" "${ARGOCD_DIR}/sourceNamespaces.txt"
@@ -433,11 +408,6 @@ function main() {
     run_and_log "oc logs deployment/${argoCDName}-repo-server -n ${namespace}" "${ARGOCD_LOG_DIR}/repo-server-logs.txt"
     run_and_log "oc logs deployment/${argoCDName}-redis -n ${namespace}" "${ARGOCD_LOG_DIR}/redis-logs.txt"
     run_and_log "oc logs deployment/${argoCDName}-dex-server -n ${namespace}" "${ARGOCD_LOG_DIR}/dex-server-logs.txt"
-
-    echo " * Getting Rollout logs in ${namespace}..."
-    ROLLOUTS_LOG_DIR="${ROLLOUTS_DIR}/logs"
-    create_directory "${ROLLOUTS_LOG_DIR}"
-    run_and_log "oc logs  deployment/argo-rollouts -n ${namespace}" "${ROLLOUTS_LOG_DIR}/rollout-logs.txt"
   
     echo " * Getting ArgoCD Managed namespaces in ${namespace}..."
     run_and_log "oc get namespaces --selector=argocd.argoproj.io/managed-by=${namespace}" "${ARGOCD_DIR}/managed-namespaces.txt"
@@ -472,6 +442,40 @@ function main() {
       create_directory "${MANAGED_RESOURCES_STATEFULSETS_DIR}"
       get_statefulSets "${managedNamespace}" "${MANAGED_RESOURCES_STATEFULSETS_DIR}"
     done
+  done
+
+  local rolloutNamespaces
+  rolloutNamespaces=$(oc get RolloutManager --all-namespaces -o jsonpath='{.items[*].metadata.namespace}')
+
+  for rolloutNamespace in ${rolloutNamespaces}; do
+    echo "Creating directory for rollouts"
+    ROLLOUTS_RESOURCES_DIR="${GITOPS_DIR}/rolloutsNamespace_${rolloutNamespace}_resources"
+    create_directory "${ROLLOUTS_RESOURCES_DIR}"
+    
+    ROLLOUTS_MANAGER_CR_DIR="${ROLLOUTS_RESOURCES_DIR}/manager_cr"
+    create_directory "${ROLLOUTS_MANAGER_CR_DIR}"
+    get_rollouts_manager_cr "${rolloutNamespace}" "${ROLLOUTS_MANAGER_CR_DIR}"
+    
+    ROLLOUTS_CR_DIR="${ROLLOUTS_RESOURCES_DIR}/cr"
+    create_directory "${ROLLOUTS_CR_DIR}"
+    get_rollouts_cr "${rolloutNamespace}" "${ROLLOUTS_CR_DIR}"
+
+    ROLLOUTS_DEPLOYMENT_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_deployment"
+    create_directory "${ROLLOUTS_DEPLOYMENT_DIR}"
+    get_rollout_deployments "${rolloutNamespace}" "${ROLLOUTS_DEPLOYMENT_DIR}"
+
+    ROLLOUTS_REPLICASET_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_replicaSet"
+    create_directory "${ROLLOUTS_REPLICASET_DIR}"
+    get_rollout_replicaSet "${rolloutNamespace}" "${ROLLOUTS_REPLICASET_DIR}"
+
+    ROLLOUTS_SERVICES_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_services"
+    create_directory "${ROLLOUTS_SERVICES_DIR}"
+    get_rollout_services "${rolloutNamespace}" "${ROLLOUTS_SERVICES_DIR}"
+
+    echo " * Getting Rollout logs in ${rolloutNamespace}..."
+    ROLLOUTS_LOG_DIR="${ROLLOUTS_RESOURCES_DIR}/logs"
+    create_directory "${ROLLOUTS_LOG_DIR}"
+    run_and_log "oc logs  deployment/argo-rollouts -n ${rolloutNamespace}" "${ROLLOUTS_LOG_DIR}/rollout-logs.txt"
   done
 
   echo " * Getting ArgoCD AppProjects from all Namespaces..."
