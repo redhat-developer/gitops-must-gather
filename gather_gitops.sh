@@ -299,7 +299,7 @@ get_rollout_replicaSet(){
   run_and_log "oc -n $1 get replicaset/argo-rollouts -o json" "$2/rollout-replicaSet.json"
 }
 
-# gets services; takes namespace and directory as argument
+# gets rollout services; takes namespace and directory as argument
 get_rollout_services(){
   echo " * Getting rollout services in $1..."
   local rolloutName
@@ -307,6 +307,16 @@ get_rollout_services(){
   run_and_log "oc -n $1 get service/${rolloutName}" "$2/rollout-service.txt"
   run_and_log "oc -n $1 get service/${rolloutName} -o yaml" "$2/rollout-service.yaml"
   run_and_log "oc -n $1 get service/${rolloutName} -o json" "$2/rollout-service.json"
+}
+
+# gets rollout configMap; takes namespace and directory as argument
+get_rollout_configMap(){
+  echo " * Getting rollout configMap in $1..."
+  local rolloutConfigMap
+  rolloutConfigMap="argo-rollouts-config"
+  run_and_log "oc -n $1 get configmap/${rolloutConfigMap}" "$2/rollout-configMap.txt"
+  run_and_log "oc -n $1 get configmap/${rolloutConfigMap} -o yaml" "$2/rollout-configMap.yaml"
+  run_and_log "oc -n $1 get configmap/${rolloutConfigMap} -o json" "$2/rollout-configMap.json"
 }
 
 function main() {
@@ -471,6 +481,10 @@ function main() {
     ROLLOUTS_SERVICES_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_services"
     create_directory "${ROLLOUTS_SERVICES_DIR}"
     get_rollout_services "${rolloutNamespace}" "${ROLLOUTS_SERVICES_DIR}"
+
+    ROLLOUTS_CONFIGMAP_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_configMap"
+    create_directory "${ROLLOUTS_CONFIGMAP_DIR}"
+    get_rollout_configMap "${rolloutNamespace}" "${ROLLOUTS_CONFIGMAP_DIR}"
 
     echo " * Getting Rollout logs in ${rolloutNamespace}..."
     ROLLOUTS_LOG_DIR="${ROLLOUTS_RESOURCES_DIR}/logs"
