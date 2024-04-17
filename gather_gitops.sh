@@ -361,6 +361,14 @@ get_rollout_experiments(){
   run_and_log "oc -n $1 get experiments" "$2/rollout-experiment.txt"
   run_and_log "oc -n $1 get experiments -o yaml" "$2/rollout-experiment.yaml"
   run_and_log "oc -n $1 get experiments -o json" "$2/rollout-experiment.json"
+# gets rollout configMap; takes namespace and directory as argument
+get_rollout_configMap(){
+  echo " * Getting rollout configMap in $1..."
+  local rolloutConfigMap
+  rolloutConfigMap="argo-rollouts-config"
+  run_and_log "oc -n $1 get configmap/${rolloutConfigMap}" "$2/rollout-configMap.txt"
+  run_and_log "oc -n $1 get configmap/${rolloutConfigMap} -o yaml" "$2/rollout-configMap.yaml"
+  run_and_log "oc -n $1 get configmap/${rolloutConfigMap} -o json" "$2/rollout-configMap.json"
 }
 
 function main() {
@@ -548,6 +556,9 @@ function main() {
     ROLLOUTS_EXPERIMENTS_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_experiments"
     create_directory "${ROLLOUTS_EXPERIMENTS_DIR}"
     get_rollout_experiments "${rolloutNamespace}" "${ROLLOUTS_EXPERIMENTS_DIR}"
+    ROLLOUTS_CONFIGMAP_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_configMap"
+    create_directory "${ROLLOUTS_CONFIGMAP_DIR}"
+    get_rollout_configMap "${rolloutNamespace}" "${ROLLOUTS_CONFIGMAP_DIR}"
 
     echo " * Getting Rollout logs in ${rolloutNamespace}..."
     ROLLOUTS_LOG_DIR="${ROLLOUTS_RESOURCES_DIR}/logs"
