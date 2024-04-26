@@ -319,6 +319,48 @@ get_rollout_configMap(){
   run_and_log "oc -n $1 get configmap/${rolloutConfigMap} -o json" "$2/rollout-configMap.json"
 }
 
+# get_rollout_events; takes namespace and directory as parameter
+get_rollout_events(){
+  echo " * Getting warning events in $1..."
+  run_and_log "oc get events -n $1 --field-selector type=Warning" "$2/warning-events.txt"
+  echo " * Getting error events in $1..."
+  run_and_log "oc get events -n $1 --field-selector type=Error" "$2/error-events.txt"
+  echo " * Getting all events in $1..."
+  run_and_log "oc get events -n $1" "$2/all-events.txt"
+}
+
+# get_rollout_analysisruns; takes namespace and directory as argument
+get_rollout_analysisruns(){
+  echo " * Getting rollout analysisrun in $1..."
+  run_and_log "oc -n $1 get analysisruns" "$2/rollout-analysisrun.txt"
+  run_and_log "oc -n $1 get analysisruns -o yaml" "$2/rollout-analysisrun.yaml"
+  run_and_log "oc -n $1 get analysisruns -o json" "$2/rollout-analysisrun.json"
+}
+
+# get_rollout_analysistemplates; takes namespace and directory as argument
+get_rollout_analysistemplates(){
+  echo " * Getting rollout analysisrun in $1..."
+  run_and_log "oc -n $1 get analysistemplates" "$2/rollout-analysistemplate.txt"
+  run_and_log "oc -n $1 get analysistemplates -o yaml" "$2/rollout-analysistemplate.yaml"
+  run_and_log "oc -n $1 get analysistemplates -o json" "$2/rollout-analysistemplate.json"
+}
+
+# get_rollout_clusteranalysistemplates; takes namespace and directory as argument
+get_rollout_clusteranalysistemplates(){
+  echo " * Getting rollout analysisrun in $1..."
+  run_and_log "oc -n $1 get clusteranalysistemplates" "$2/rollout-clusteranalysistemplate.txt"
+  run_and_log "oc -n $1 get clusteranalysistemplates -o yaml" "$2/rollout-clusteranalysistemplate.yaml"
+  run_and_log "oc -n $1 get clusteranalysistemplates -o json" "$2/rollout-clusteranalysistemplate.json"
+}
+
+# get_rollout_experiments; takes namespace and directory as argument
+get_rollout_experiments(){
+  echo " * Getting rollout analysisrun in $1..."
+  run_and_log "oc -n $1 get experiments" "$2/rollout-experiment.txt"
+  run_and_log "oc -n $1 get experiments -o yaml" "$2/rollout-experiment.yaml"
+  run_and_log "oc -n $1 get experiments -o json" "$2/rollout-experiment.json"
+}
+
 function main() {
 
   # Initialize the directory where the must-gather data will be stored and the error log file
@@ -485,6 +527,26 @@ function main() {
     ROLLOUTS_CONFIGMAP_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_configMap"
     create_directory "${ROLLOUTS_CONFIGMAP_DIR}"
     get_rollout_configMap "${rolloutNamespace}" "${ROLLOUTS_CONFIGMAP_DIR}"
+
+    ROLLOUTS_EVENTS_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_events"
+    create_directory "${ROLLOUTS_EVENTS_DIR}"
+    get_rollout_events "${rolloutNamespace}" "${ROLLOUTS_EVENTS_DIR}"
+
+    ROLLOUTS_ANALYSISRUN_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_analysisruns"
+    create_directory "${ROLLOUTS_ANALYSISRUN_DIR}"
+    get_rollout_analysisruns "${rolloutNamespace}" "${ROLLOUTS_ANALYSISRUN_DIR}"
+
+    ROLLOUTS_ANALYSISTEMPLATES_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_analysistemplates"
+    create_directory "${ROLLOUTS_ANALYSISTEMPLATES_DIR}"
+    get_rollout_analysistemplates "${rolloutNamespace}" "${ROLLOUTS_ANALYSISTEMPLATES_DIR}"
+
+    ROLLOUTS_CLUSTERANALYSISTEMPLATES_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_clusteranalysistemplates"
+    create_directory "${ROLLOUTS_CLUSTERANALYSISTEMPLATES_DIR}"
+    get_rollout_analysistemplates "${rolloutNamespace}" "${ROLLOUTS_CLUSTERANALYSISTEMPLATES_DIR}"
+
+    ROLLOUTS_EXPERIMENTS_DIR="${ROLLOUTS_RESOURCES_DIR}/rollout_experiments"
+    create_directory "${ROLLOUTS_EXPERIMENTS_DIR}"
+    get_rollout_experiments "${rolloutNamespace}" "${ROLLOUTS_EXPERIMENTS_DIR}"
 
     echo " * Getting Rollout logs in ${rolloutNamespace}..."
     ROLLOUTS_LOG_DIR="${ROLLOUTS_RESOURCES_DIR}/logs"
