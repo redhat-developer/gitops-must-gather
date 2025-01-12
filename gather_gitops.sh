@@ -1,8 +1,54 @@
 #!/usr/bin/env bash
 
+# This script gathers various resources related to GitOps in an OpenShift cluster.
+# It collects information about CRDs, namespaces, and resources related to argoproj.io and operators.coreos.com.
+# The script logs its actions to ${LOGS_DIR}/gather_gitops.log and errors to ${LOGS_DIR}/gather_gitops_errors.log.
+# Usage: ./gather_gitops.sh [--help]
+
 set -eu -o pipefail
 
 LOGS_DIR="/must-gather"
+ERROR_LOG="${LOGS_DIR}/gather_gitops_errors.log"
+RETRY_COUNT=3
+RETRY_DELAY=5
+
+# Function to log errors
+log_error() {
+    echo "$1" | tee -a "${ERROR_LOG}"
+}
+
+# Function to execute a command with retries
+execute_with_retries() {
+    local cmd="$1"
+    local retries=0
+    until [ $retries -ge $RETRY_COUNT ]; do
+        eval "$cmd" && break
+        retries=$((retries + 1))
+        log_error "Command failed: $cmd. Retrying in ${RETRY_DELAY} seconds..."
+        sleep $RETRY_DELAY
+    done
+    if [ $retries -eq $RETRY_COUNT ]; then
+        log_error "Command failed after ${RETRY_COUNT} attempts: $cmd"
+    fi
+}
+
+# Function to display help message
+show_help() {
+    echo "Usage: ./gather_gitops.sh [--help]"
+    echo
+    echo "This script gathers various resources related to GitOps in an OpenShift cluster."
+    echo "It collects information about CRDs, namespaces, and resources related to argoproj.io and operators.coreos.com."
+    echo "The script logs its actions to ${LOGS_DIR}/gather_gitops.log and errors to ${LOGS_DIR}/gather_gitops_errors.log."
+    echo
+    echo "Options:"
+    echo "  --help    Show this help message and exit"
+}
+
+# Check for --help flag
+if [[ "$#" -eq 1 && "$1" == "--help" ]]; then
+    show_help
+    exit 0
+fi
 
 mkdir -p ${LOGS_DIR}
 
@@ -11,7 +57,7 @@ GITOPS_CURRENT_CSV=$(oc get subscription.operators.coreos.com --ignore-not-found
 # Gathering cluster version all the crd related to operators.coreos.com and argoproj.io
 echo "gather_gitops:$LINENO] inspecting crd, clusterversion .." | tee -a ${LOGS_DIR}/gather_gitops.log
 # Getting non.existent.crd is a hack to avoid getting all available crds in the cluster in case there are no owned resources that do not contain "argoproj.io"
-oc adm inspect --dest-dir=${LOGS_DIR} $(oc get crd -o name | egrep -i "argoproj.io|operators.coreos.com") $(oc get crd non.existent.crd --ignore-not-found $(oc get csv --ignore-not-found $GITOPS_CURRENT_CSV -o json | jq '.spec.customresourcedefinitions.owned[] | select(.name | contains("argoproj.io") | not) | " " + .name' -rj) -o name) clusterversion/version > /dev/null
+execute_with_retries "oc adm inspect --dest-dir=${LOGS_DIR} \$(oc get crd -o name | egrep -i 'argoproj.io|operators.coreos.com') \$(oc get crd non.existent.crd --ignore-not-found \$(oc get csv --ignore-not-found \$GITOPS_CURRENT_CSV -o json | jq '.spec.customresourcedefinitions.owned[] | select(.name | contains(\"argoproj.io\") | not) | \" \" + .name' -rj) -o name) clusterversion/version > /dev/null"
 
 # Gathering all namespaced custom resources across the cluster that contains "argoproj.io" related custom resources
 oc get crd -o json | jq -r '.items[] | select((.spec.group | contains ("argoproj.io")) and .spec.scope=="Namespaced") | .spec.group + " " + .metadata.name + " " + .spec.names.plural' |
@@ -20,7 +66,7 @@ while read API_GROUP APIRESOURCE API_PLURAL_NAME; do
     NAMESPACES=$(oc get ${APIRESOURCE} --all-namespaces=true --ignore-not-found -o jsonpath='{range .items[*]}{@.metadata.namespace}{"\n"}{end}' | uniq)
     for NAMESPACE in ${NAMESPACES[@]}; do
         mkdir -p ${LOGS_DIR}/namespaces/${NAMESPACE}/${API_GROUP}
-        oc get ${APIRESOURCE} -n ${NAMESPACE} -o=yaml >${LOGS_DIR}/namespaces/${NAMESPACE}/${API_GROUP}/${API_PLURAL_NAME}.yaml
+        execute_with_retries "oc get ${APIRESOURCE} -n ${NAMESPACE} -o=yaml >${LOGS_DIR}/namespaces/${NAMESPACE}/${API_GROUP}/${API_PLURAL_NAME}.yaml"
     done
 done 
 
@@ -32,7 +78,7 @@ while read API_GROUP APIRESOURCE API_PLURAL_NAME; do
     NAMESPACES=$(oc get ${APIRESOURCE} --all-namespaces=true --ignore-not-found -o jsonpath='{range .items[*]}{@.metadata.namespace}{"\n"}{end}' | uniq)
     for NAMESPACE in ${NAMESPACES[@]}; do
         mkdir -p ${LOGS_DIR}/namespaces/${NAMESPACE}/${API_GROUP}
-        oc get ${APIRESOURCE} -n ${NAMESPACE} -o=yaml >${LOGS_DIR}/namespaces/${NAMESPACE}/${API_GROUP}/${API_PLURAL_NAME}.yaml
+        execute_with_retries "oc get ${APIRESOURCE} -n ${NAMESPACE} -o=yaml >${LOGS_DIR}/namespaces/${NAMESPACE}/${API_GROUP}/${API_PLURAL_NAME}.yaml"
     done
 done 
 
@@ -41,7 +87,7 @@ oc get crd -o json | jq -r '.items[] | select((.spec.group | contains ("argoproj
 while read API_GROUP APIRESOURCE API_PLURAL_NAME; do 
     mkdir -p ${LOGS_DIR}/cluster-scoped-resources/${API_GROUP}
     echo "gather_gitops:$LINENO] collecting ${APIRESOURCE} .." | tee -a ${LOGS_DIR}/gather_gitops.log
-    oc get ${APIRESOURCE} -o=yaml >${LOGS_DIR}/cluster-scoped-resources/${API_GROUP}/${API_PLURAL_NAME}.yaml 
+    execute_with_retries "oc get ${APIRESOURCE} -o=yaml >${LOGS_DIR}/cluster-scoped-resources/${API_GROUP}/${API_PLURAL_NAME}.yaml"
 done 
 
 # Gathering all cluster-scoped custom resources across the cluster that are owned by gitops-operator but do not contain "argoproj.io"
@@ -50,7 +96,7 @@ oc get crd --ignore-not-found non.existent.crd $(oc get csv --ignore-not-found $
 while read API_GROUP APIRESOURCE API_PLURAL_NAME; do 
     mkdir -p ${LOGS_DIR}/cluster-scoped-resources/${API_GROUP}
     echo "gather_gitops:$LINENO] collecting ${APIRESOURCE} .." | tee -a ${LOGS_DIR}/gather_gitops.log
-    oc get ${APIRESOURCE} -o=yaml >${LOGS_DIR}/cluster-scoped-resources/${API_GROUP}/${API_PLURAL_NAME}.yaml 
+    execute_with_retries "oc get ${APIRESOURCE} -o=yaml >${LOGS_DIR}/cluster-scoped-resources/${API_GROUP}/${API_PLURAL_NAME}.yaml"
 done 
 
 # Inspecting namespace reported in ARGOCD_CLUSTER_CONFIG_NAMESPACES, openshift-gitops and openshift-gitops-operator, and namespaces containing ArgoCD instances
@@ -59,9 +105,9 @@ oc get ns --ignore-not-found $(oc get subs -A --ignore-not-found -o json | jq '.
 | jq '.items | unique |.[] | .metadata.name' -r |
 while read NAMESPACE; do
   echo "gather_gitops:$LINENO] inspecting namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
-  oc adm inspect --dest-dir=${LOGS_DIR} ns/$NAMESPACE > /dev/null
+  execute_with_retries "oc adm inspect --dest-dir=${LOGS_DIR} ns/$NAMESPACE > /dev/null"
   echo "gather_gitops:$LINENO] inspecting csv,sub,ip for namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
-  oc adm inspect --dest-dir=${LOGS_DIR} $(oc get --ignore-not-found clusterserviceversions.operators.coreos.com,installplans.operators.coreos.com,subscriptions.operators.coreos.com -o name -n $NAMESPACE) -n $NAMESPACE &> /dev/null \
+  execute_with_retries "oc adm inspect --dest-dir=${LOGS_DIR} \$(oc get --ignore-not-found clusterserviceversions.operators.coreos.com,installplans.operators.coreos.com,subscriptions.operators.coreos.com -o name -n $NAMESPACE) -n $NAMESPACE &> /dev/null" \
   || echo "gather_gitops:$LINENO] no csv,sub,ip found in namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
 done
 
@@ -70,5 +116,5 @@ echo "gather_gitops:$LINENO] inspecting namespaces managed by ArgoCD .." | tee -
 oc get ns -o json | jq '.items[] | select(.metadata.labels | keys[] | contains("argocd.argoproj.io/managed-by")) | .metadata.name' -r |
 while read NAMESPACE; do
   echo "gather_gitops:$LINENO] inspecting namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
-  oc adm inspect --dest-dir=${LOGS_DIR} ns/$NAMESPACE > /dev/null
+  execute_with_retries "oc adm inspect --dest-dir=${LOGS_DIR} ns/$NAMESPACE > /dev/null"
 done
