@@ -5,7 +5,7 @@
 ## Usage
 
 ```sh
-oc adm must-gather --image=quay.io/redhat-developer/gitops-must-gather:latest
+oc adm must-gather --image=registry.redhat.io/openshift-gitops-1/gitops-must-gather-rhel-8:v1.9.0
 ```
 
 The command above will create a local directory with a dump of the OpenShift GitOps state. Note that this command will only get data related to the GitOps Operator in your OpenShift cluster.
