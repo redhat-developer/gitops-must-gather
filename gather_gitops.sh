@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -eu -o pipefail
+s=declare_out_of_trap_script # Workaround for https://github.com/koalaman/shellcheck/issues/3287
 trap 's=$?; echo >&2 "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 LOGS_DIR="/must-gather"
