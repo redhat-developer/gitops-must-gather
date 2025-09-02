@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # https://github.com/olivergondza/bash-strict-mode
 set -eEuo pipefail
+s=declare_out_of_trap_script # Workaround for https://github.com/koalaman/shellcheck/issues/3287
 trap 's=$?; echo >&2 "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
-
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 function main() {
     if [[ $# -ne 2 ]]; then
@@ -15,7 +14,7 @@ function main() {
 
     inv_a="$(mktemp -d gitops-must-gather-A-XXXX)"
     inv_b="$(mktemp -d gitops-must-gather-B-XXXX)"
-    trap "rm -rf '${inv_a}' '${inv_b}'" EXIT
+    trap 'rm -rf "${inv_a}" "${inv_b}"' EXIT
 
     gather "$img_a" "$inv_a"
     gather "$img_b" "$inv_b"
@@ -55,8 +54,10 @@ function sanitize() {
         "$dir/oc-adm-output.log" "$dir/must-gather.logs" "$dir/__RESOURCES__/gather.logs" "$dir/__RESOURCES__/gather_gitops.log"
 
     # Timestamps are not going to match, just test there is the same number of them
-    wc -l < "$dir/timestamp" > "$dir/timestamp"
-    wc -l < "$dir/__RESOURCES__/timestamp" > "$dir/__RESOURCES__/timestamp"
+    ts="$(wc -l < "$dir/timestamp")"
+    echo "$ts" > "$dir/timestamp"
+    ts="$(wc -l < "$dir/__RESOURCES__/timestamp")"
+    echo "$ts" > "$dir/__RESOURCES__/timestamp"
 }
 
 main "$@"
