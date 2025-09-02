@@ -184,13 +184,14 @@ Note: most of the resource outputs are given in 3 file types: `.json`, `.yaml`, 
 
 ## Testing
 
-You can run the script locally from your workstation.
-To do that you need an OpenShift cluster and you will have to install the Red Hat GitOps Operator.
-Then you can run the script like this:
+To do that you need an OpenShift cluster, and you will have to install the Red Hat GitOps Operator.
+Then you can test how your changes affects gathered data:
 
 ```shell
-chmod +x ./gather_gitops.sh
-./gather_gitops.sh --base-collection-path .
+# You may need to create the repository on quay.io manually to make sure it is public
+make REGISTRY_USERNAME=my-non-production-org CONTAINER_IMAGE_TAG="$(git rev-parse HEAD)" push
+# Note some differences are expected, like few lines in rapidly populated logs
+./test/compare.sh registry.redhat.io/openshift-gitops-1/must-gather-rhel8:"$SOME_OLD_VERSION" quay.io/my-non-production-org/gitops-must-gather:"$(git rev-parse HEAD)"
 ```
 
 Last but not least, please make sure you run `make lint` before pushing new changes.
