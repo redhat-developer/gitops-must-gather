@@ -9,7 +9,11 @@ LOGS_DIR="/must-gather"
 mkdir -p ${LOGS_DIR}
 
 GITOPS_CURRENT_CSV=$(oc get subscription.operators.coreos.com --ignore-not-found -A -o json | jq '.items[] | select(.metadata.name=="openshift-gitops-operator") | .status.currentCSV' -r)
-readarray -t NON_ARGO_CRD_NAMES < <(oc get csv --ignore-not-found "$GITOPS_CURRENT_CSV" -o json | jq '.spec.customresourcedefinitions.owned[] | select(.name | contains("argoproj.io") | not) | .name' -rj)
+if [ -z "$GITOPS_CURRENT_CSV" ]; then
+    NON_ARGO_CRD_NAMES=()
+else
+    readarray -t NON_ARGO_CRD_NAMES < <(oc get csv --ignore-not-found "$GITOPS_CURRENT_CSV" -o json | jq '.spec.customresourcedefinitions.owned[] | select(.name | contains("argoproj.io") | not) | .name' -rj)
+fi
 
 # Gathering cluster version all the crd related to operators.coreos.com and argoproj.io
 echo "gather_gitops:$LINENO] inspecting crd, clusterversion .." | tee -a ${LOGS_DIR}/gather_gitops.log
