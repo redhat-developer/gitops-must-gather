@@ -73,8 +73,11 @@ while read -r NAMESPACE; do
   oc adm inspect --dest-dir=${LOGS_DIR} "ns/$NAMESPACE" > /dev/null
   echo "gather_gitops:$LINENO] inspecting csv,sub,ip for namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
   readarray -t CSVS_SUBS_IPS < <(oc get --ignore-not-found clusterserviceversions.operators.coreos.com,installplans.operators.coreos.com,subscriptions.operators.coreos.com -o name -n "$NAMESPACE")
-  oc adm inspect --dest-dir=${LOGS_DIR} "${CSVS_SUBS_IPS[@]}" -n "$NAMESPACE" &> /dev/null \
-  || echo "gather_gitops:$LINENO] no csv,sub,ip found in namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
+  if [ "${#CSVS_SUBS_IPS[@]}" -eq 0 ]; then
+      echo "gather_gitops:$LINENO] no csv,sub,ip found in namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
+  else
+      oc adm inspect --dest-dir=${LOGS_DIR} "${CSVS_SUBS_IPS[@]}" -n "$NAMESPACE" &> /dev/null
+  fi
 done
 
 # Inspecting namespace managed by ArgoCD
