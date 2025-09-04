@@ -1,16 +1,14 @@
 # See the OWNERS docs: https://git.k8s.io/community/contributors/guide/owners.md
 
 approvers:
-- drpaneas
-- iam-veeramalla
+- olivergondza
+- jannfis
 - wtam2018
-- reginapizza
+- anandf
 
 reviewers:
-- drpaneas
-- iam-veeramalla
+- olivergondza
+- jannfis
 - wtam2018
-- reginapizza
-- jaideepr97
+- anandf
 - varshab1210
-- bluengo
