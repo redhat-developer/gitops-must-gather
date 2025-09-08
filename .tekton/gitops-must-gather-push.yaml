@@ -488,7 +488,8 @@ spec:
       optional: true
     - name: netrc
       optional: true
-  taskRunTemplate: {}
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-gitops-must-gather
   workspaces:
   - name: git-auth
     secret:
