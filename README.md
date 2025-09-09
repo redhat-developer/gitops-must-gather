@@ -22,179 +22,56 @@ You will get a dump of:
 - Logs of Argo CD
 - Warning and error-level Events
 
-In addition to that, we will get a summary of:
+To get data about other parts of the cluster (not specific to [gitops-operator](https://github.com/redhat-developer/gitops-operator/)), run `oc adm must-gather` (without passing a custom image).
+Run `oc adm must-gather -h` to see more options.
 
-- All executed commands: `must-gather-script-commands.txt`
-- Errors: `must-gather-script-errors.txt`
-- Commands that produced no output: `must-gather-script-no-output.txt`
+## Development
 
-All the output of the commands is stored into 3 different formats:
-
-- `*.txt` that represents the normal view without any structure.
-- `*.yaml` that is the YAML output of the command.
-- `*.json` that is the JSON output of the command.
-
-In order to get data about other parts of the cluster (not specific to gitops-operator) you should run just `oc adm must-gather` (without passing a custom image). Run `oc adm must-gather -h` to see more options.
-
-An example of the GitOps must-gather output would be something like the following, where there are two argocd instances in namespaces `openshift-gitops` and `foo` and an additional namespace called `foo-managed` which is managed by namespace `foo`:
-
-```shell
-cluster-gitops
-    └── gitops
-        ├── clusterversion.txt
-        ├── crds
-        │  ├── crds.json/.txt./.yaml
-        ├── managedNamespace_foo-managed
-        │  └── resources
-        │      ├── deployments
-        │      ├── pods
-        │      ├── replicasets
-        │      ├── routes
-        │      ├── services
-        │      └── statefulsets
-        ├── namespace_foo_resources
-        │  ├── argocd
-        │  │  ├── applications
-        │  │  │  ├── applications.json/.txt./.yaml
-        │  │  │  └── guestbook.yaml
-        │  │  ├── applicationsets
-        │  │  │  ├── applicationsets.txt
-        │  │  │  ├── guestbook.json
-        │  │  │  ├── guestbook.txt
-        │  │  │  └── guestbook.yaml
-        │  │  ├── argocd.json
-        │  │  ├── argocd.txt
-        │  │  ├── argocd.yaml
-        │  │  ├── logs
-        │  │  │  └── server-logs.txt
-        │  │  ├── managed-namespaces.txt
-        │  │  └── sourceNamespaces.txt
-        │  ├── deployments
-        │  │  ├── argocd-dex-server.json/.txt./.yaml
-        │  │  ├── argocd-redis.json/.txt./.yaml
-        │  │  ├── argocd-repo-server.json/.txt./.yaml
-        │  │  ├── argocd-server.json/.txt./.yaml
-        │  │  └── deployments.txt
-        │  ├── events
-        │  │  ├── all-events.txt
-        │  │  └── warning-events.txt
-        │  ├── pods
-        │  │  ├── argocd-application-controller-0.json/.txt./.yaml
-        │  │  ├── argocd-dex-server-69f99bdd45-g84b9.json/.txt./.yaml
-        │  │  ├── argocd-dex-server-6d4f7d9d48-rkk9d.json/.txt./.yaml
-        │  │  ├── argocd-redis-78d4849f68-pxxbp.json/.txt./.yaml
-        │  │  ├── argocd-repo-server-6cfc8bbd5f-w4bsg.json/.txt./.yaml
-        │  │  ├── argocd-server-5dc69475bf-98m6s.json/.txt./.yaml
-        │  │  └── pods.txt
-        │  ├── replicaSets
-        │  │  ├── argocd-dex-server-69f99bdd45.json/.txt./.yaml
-        │  │  ├── argocd-dex-server-6d4f7d9d48.json/.txt./.yaml
-        │  │  ├── argocd-redis-78d4849f68.json/.txt./.yaml
-        │  │  ├── argocd-repo-server-6cfc8bbd5f.json/.txt./.yaml
-        │  │  ├── argocd-server-5dc69475bf.json/.txt./.yaml
-        │  │  └── replicaSets.txt
-        │  ├── routes
-        │  │  ├── argocd-server.json/.txt./.yaml
-        │  │  └── routes.txt
-        │  ├── services
-        │  │  ├── argocd-dex-server.json/.txt./.yaml
-        │  │  ├── argocd-metrics.json/.txt./.yaml
-        │  │  ├── argocd-redis.json/.txt./.yaml
-        │  │  ├── argocd-repo-server.json/.txt./.yaml
-        │  │  ├── argocd-server.json/.txt./.yaml
-        │  │  ├── argocd-server-metrics.json/.txt./.yaml
-        │  │  └── services.txt
-        │  └── statefulsets
-        │      ├── argocd-application-controller.json/.txt./.yaml
-        │      └── statefulsets.txt
-        ├── namespace_openshift-gitops_resources
-        │  ├── argocd
-        │  │  ├── applications
-        │  │  ├── applicationsets
-        │  │  ├── appprojects
-        │  │  ├── appprojects.json/.txt./.yaml
-        │  │  ├── argocd.txt
-        │  │  ├── logs
-        │  │  │  ├── application-controller-logs.txt
-        │  │  │  ├── dex-server-logs.txt
-        │  │  │  ├── redis-logs.txt
-        │  │  │  ├── repo-server-logs.txt
-        │  │  │  └── server-logs.txt
-        │  │  ├── openshift-gitops.json
-        │  │  ├── openshift-gitops.txt
-        │  │  ├── openshift-gitops.yaml
-        │  │  └── sourceNamespaces.txt
-        │  ├── deployments
-        │  │  ├── cluster.json/.txt./.yaml
-        │  │  ├── deployments.txt
-        │  │  ├── kam.json
-        │  │  ├── kam.txt
-        │  │  ├── kam.yaml
-        │  │  ├── openshift-gitops-applicationset-controller.json/.txt./.yaml
-        │  │  ├── openshift-gitops-dex-server.json/.txt./.yaml
-        │  │  ├── openshift-gitops-redis.json/.txt./.yaml
-        │  │  ├── openshift-gitops-repo-server.json/.txt./.yaml
-        │  │  ├── openshift-gitops-server.json/.txt./.yaml
-        │  ├── events
-        │  ├── pods
-        │  │  ├── cluster-5db4b95547-mks98.json/.txt./.yaml
-        │  │  ├── kam-fff7f474f-t875v.json/.txt./.yaml
-        │  │  ├── openshift-gitops-application-controller-0.json/.txt./.yaml
-        │  │  ├── openshift-gitops-applicationset-controller-5dbdfcc689-6x4vf.json/.txt./.yaml
-        │  │  ├── openshift-gitops-dex-server-5bf6f4f684-ghtqf.json/.txt./.yaml
-        │  │  ├── openshift-gitops-redis-664cdd4757-f9jcc.json/.txt./.yaml
-        │  │  ├── openshift-gitops-repo-server-6795d6d8cd-x7hzc.json/.txt./.yaml
-        │  │  ├── openshift-gitops-server-6cc58f9cc8-fx8g7.json/.txt./.yaml
-        │  │  └── pods.txt
-        │  ├── replicaSets
-        │  │  ├── cluster-5db4b95547.json/.txt./.yaml
-        │  │  ├── kam-fff7f474f.json/.txt./.yaml
-        │  │  ├── openshift-gitops-applicationset-controller-5dbdfcc689.json/.txt./.yaml
-        │  │  ├── openshift-gitops-dex-server-5bf6f4f684.json/.txt./.yaml
-        │  │  ├── openshift-gitops-dex-server-684c85d5d7.json/.txt./.yaml
-        │  │  ├── openshift-gitops-redis-664cdd4757.json/.txt./.yaml
-        │  │  ├── openshift-gitops-repo-server-6795d6d8cd.json/.txt./.yaml
-        │  │  ├── openshift-gitops-server-6cc58f9cc8.json/.txt./.yaml
-        │  │  └── replicaSets.txt
-        │  ├── routes
-        │  │  ├── kam.json/.txt./.yaml
-        │  │  ├── openshift-gitops-server.json/.txt./.yaml
-        │  │  └── routes.txt
-        │  ├── services
-        │  │  ├── cluster.json/.txt./.yaml
-        │  │  ├── kam.json/.txt./.yaml
-        │  │  ├── openshift-gitops-applicationset-controller.json/.txt./.yaml
-        │  │  ├── openshift-gitops-dex-server.json/.txt./.yaml
-        │  │  ├── openshift-gitops-metrics.json/.txt./.yaml
-        │  │  ├── openshift-gitops-redis.json/.txt./.yaml
-        │  │  ├── openshift-gitops-repo-server.json/.txt./.yaml
-        │  │  ├── openshift-gitops-server.json/.txt./.yaml
-        │  │  ├── openshift-gitops-server-metrics.json/.txt./.yaml
-        │  │  └── services.txt
-        │  └── statefulsets
-        │      ├── openshift-gitops-application-controller.json/.txt./.yaml
-        │      └── statefulsets.txt
-        ├── oc-version.txt
-        ├── subscription.json/.txt./.yaml
-        ├── must-gather-script-commands.txt
-        ├── must-gather-script-no-output.txt
-        └── must-gather-script-errors.txt
-```
-Note: most of the resource outputs are given in 3 file types: `.json`, `.yaml`, and `.txt`, however those files are combined in this tree for clarity and conciseness. 
-
-## Testing
-
-To do that you need an OpenShift cluster, and you will have to install the Red Hat GitOps Operator.
-Then you can test how your changes affects gathered data:
-
-```shell
-# You may need to create the repository on quay.io manually to make sure it is public
-make REGISTRY_USERNAME=my-non-production-org CONTAINER_IMAGE_TAG="$(git rev-parse HEAD)" push
-# Note some differences are expected, like few lines in rapidly populated logs
-./test/compare.sh registry.redhat.io/openshift-gitops-1/must-gather-rhel8:"$SOME_OLD_VERSION" quay.io/my-non-production-org/gitops-must-gather:"$(git rev-parse HEAD)"
-```
-
-Last but not least, please make sure you run `make lint` before pushing new changes.
+Make sure you run `make lint` before pushing new changes.
 This requires `shellcheck` to be installed in your machine.
 
 For more information about `building` and `pushing` the image, see `make help`.
+
+### Image publishing
+
+CD images are pushed to the following destinations, from where they can be used for testing:
+
+- HEAD of the `main` branch: quay.io/redhat-user-workloads/rh-openshift-gitops-tenant/gitops-must-gather:latest
+- PRs: quay.io/redhat-user-workloads/rh-openshift-gitops-tenant/gitops-must-gather:on-pr-<GIT_COMMIT_SHA>
+- `main` branch: quay.io/redhat-user-workloads/rh-openshift-gitops-tenant/gitops-must-gather:<GIT_COMMIT_SHA>
+
+Custom image can be pushed, too:
+
+```shell
+# You may need to create the repository on quay.io manually to make sure it is public
+make REGISTRY_USERNAME=my-non-production-org CONTAINER_IMAGE_TAG=latest push
+```
+It is recomanded to use `latest` tag for development, because it does not get cached on OpenShift nodes - other tags might.
+
+## Testing
+
+Create the OpenShift cluster, log in and install the Red Hat GitOps Operator.
+
+For the development version, use:
+```shell
+git clone https://github.com/redhat-developer/gitops-operator/
+cd gitops-operator
+make clean install 
+```
+
+### Compare gathered data between 2 gitops-must-gather images
+
+```shell
+# Note some differences are expected, like a few lines at the end of rapidly populated logs, etc.
+./test/compare.sh registry.redhat.io/openshift-gitops-1/must-gather-rhel8:"$SOME_OLD_VERSION" quay.io/my-non-production-org/gitops-must-gather:latest
+```
+
+### Verify the structure of the must-gather output
+
+```shell
+# After logging in to a cluster
+git clone https://github.com/redhat-developer/gitops-operator/
+cd gitops-operator
+env E2E_MUST_GATHER_IMAGE=<TESTED_IMAGE_HERE> LOCAL_RUN=true \
+    ./bin/ginkgo -v -focus "validate_running_must_gather" -r ./test/openshift/e2e/ginkgo/parallel/
+```
