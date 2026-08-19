@@ -8,7 +8,11 @@ LOGS_DIR="/must-gather"
 
 mkdir -p ${LOGS_DIR}
 
-GITOPS_CURRENT_CSV=$(oc get subscription.operators.coreos.com --ignore-not-found -A -o json | jq '.items[] | select(.metadata.name=="openshift-gitops-operator") | .status.currentCSV' -r)
+GITOPS_CURRENT_CSV=$(
+    oc get subscriptions.operators.coreos.com --ignore-not-found -A -o json \
+    | jq -r '.items[] | select(.metadata.name=="openshift-gitops-operator") | .status.currentCSV' \
+    || true # Subscription resource is missing on k8s or future OCP version
+)
 if [ -z "$GITOPS_CURRENT_CSV" ]; then
     NON_ARGO_CRD_NAMES=()
 else
@@ -20,7 +24,7 @@ echo "gather_gitops:$LINENO] inspecting crd, clusterversion .." | tee -a ${LOGS_
 readarray -t UPSTREAM_CRDS < <(oc get crd -o name | grep -Ei "argoproj.io|operators.coreos.com")
 # Getting non.existent.crd is a hack to avoid getting all available crds in the cluster in case there are no owned resources that do not contain "argoproj.io"
 readarray -t NON_ARGO_CRDS < <(oc get crd non.existent.crd --ignore-not-found "${NON_ARGO_CRD_NAMES[@]}" -o name)
-oc adm inspect --dest-dir=${LOGS_DIR} "${UPSTREAM_CRDS[@]}" "${NON_ARGO_CRDS[@]}" clusterversion/version > /dev/null
+oc adm inspect --dest-dir=${LOGS_DIR} "${UPSTREAM_CRDS[@]}" "${NON_ARGO_CRDS[@]}" clusterversion/version > /dev/null || true # ClusterVersion resource is missing on k8s
 
 # Gathering all namespaced custom resources across the cluster that contains "argoproj.io" related custom resources
 oc get crd -o json | jq -r '.items[] | select((.spec.group | contains ("argoproj.io")) and .spec.scope=="Namespaced") | .spec.group + " " + .metadata.name + " " + .spec.names.plural' |
@@ -64,7 +68,7 @@ done
 
 # Inspecting namespace reported in ARGOCD_CLUSTER_CONFIG_NAMESPACES, openshift-gitops and openshift-gitops-operator, and namespaces containing ArgoCD instances
 echo "gather_gitops:$LINENO] inspecting \$ARGOCD_CLUSTER_CONFIG_NAMESPACES, openshift-gitops and openshift-gitops-operator namespaces and namespaces containing ArgoCD instances .." | tee -a ${LOGS_DIR}/gather_gitops.log
-readarray -t SUBSCRIPTIONS < <(oc get subs -A --ignore-not-found -o json | jq '.items[] | select(.metadata.name=="openshift-gitops-operator") | .spec.config.env[]?|select(.name=="ARGOCD_CLUSTER_CONFIG_NAMESPACES")| " " + .value | sub(","; " ")' -rj)
+readarray -t SUBSCRIPTIONS < <(oc get subscriptions.operators.coreos.com -A --ignore-not-found -o json | jq '.items[] | select(.metadata.name=="openshift-gitops-operator") | .spec.config.env[]?|select(.name=="ARGOCD_CLUSTER_CONFIG_NAMESPACES")| " " + .value | sub(","; " ")' -rj)
 readarray -t ARGO_CRDS < <(oc get ArgoCD,Rollout,RolloutManager -A -o json | jq '.items[] | " " + .metadata.namespace' -rj)
 oc get ns --ignore-not-found "${SUBSCRIPTIONS[@]}" "${ARGO_CRDS[@]}" openshift-gitops openshift-gitops-operator -o json \
 | jq '.items | unique |.[] | .metadata.name' -r |
@@ -80,7 +84,7 @@ while read -r NAMESPACE; do
   fi
 done
 
-# Inspecting namespace managed by ArgoCD
+# Inspecting namespaces managed by ArgoCD
 echo "gather_gitops:$LINENO] inspecting namespaces managed by ArgoCD .." | tee -a ${LOGS_DIR}/gather_gitops.log
 oc get ns -o json | jq '.items[] | select(.metadata.labels | keys[] | contains("argocd.argoproj.io/managed-by")) | .metadata.name' -r |
 while read -r NAMESPACE; do
