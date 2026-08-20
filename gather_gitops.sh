@@ -71,6 +71,7 @@ oc get ns --ignore-not-found "${SUBSCRIPTIONS[@]}" "${ARGO_CRDS[@]}" openshift-g
 while read -r NAMESPACE; do
   echo "gather_gitops:$LINENO] inspecting namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
   oc adm inspect --dest-dir=${LOGS_DIR} "ns/$NAMESPACE" > /dev/null
+  oc adm inspect --dest-dir=${LOGS_DIR} -n "$NAMESPACE" roles,rolebindings > /dev/null
   echo "gather_gitops:$LINENO] inspecting csv,sub,ip for namespace $NAMESPACE .." | tee -a ${LOGS_DIR}/gather_gitops.log
   readarray -t CSVS_SUBS_IPS < <(oc get --ignore-not-found clusterserviceversions.operators.coreos.com,installplans.operators.coreos.com,subscriptions.operators.coreos.com -o name -n "$NAMESPACE")
   if [ "${#CSVS_SUBS_IPS[@]}" -eq 0 ]; then
