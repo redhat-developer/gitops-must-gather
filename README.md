@@ -73,5 +73,5 @@ make clean install
 git clone https://github.com/redhat-developer/gitops-operator/
 cd gitops-operator
 env E2E_MUST_GATHER_IMAGE=<TESTED_IMAGE_HERE> LOCAL_RUN=true \
-    ./bin/ginkgo -v -focus "validate_running_must_gather" -r ./test/openshift/e2e/ginkgo/parallel/
+    ./bin/ginkgo -v -focus "validate_running_must_gather" -r ./test/openshift/e2e/ginkgo/sequential/
 ```
