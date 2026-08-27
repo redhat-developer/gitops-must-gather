@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    target-branch: main
+    # Root Dockerfile FROM only. Konflux Containerfile uses private registry.redhat.io.
+    exclude-paths:
+      - .konflux/**
