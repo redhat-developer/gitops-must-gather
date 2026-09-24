@@ -70,8 +70,8 @@ oc adm inspect --dest-dir=${LOGS_DIR} clusterrole,clusterrolebinding > /dev/null
 
 # Inspecting namespace reported in ARGOCD_CLUSTER_CONFIG_NAMESPACES, openshift-gitops and openshift-gitops-operator, and namespaces containing ArgoCD instances
 echo "gather_gitops:$LINENO] inspecting \$ARGOCD_CLUSTER_CONFIG_NAMESPACES, openshift-gitops and openshift-gitops-operator namespaces and namespaces containing ArgoCD instances .." | tee -a ${LOGS_DIR}/gather_gitops.log
-readarray -t SUBSCRIPTIONS < <(oc get subscriptions.operators.coreos.com -A --ignore-not-found -o json | jq '.items[] | select(.metadata.name=="openshift-gitops-operator") | .spec.config.env[]?|select(.name=="ARGOCD_CLUSTER_CONFIG_NAMESPACES")| " " + .value | sub(","; " ")' -rj)
-readarray -t ARGO_CRDS < <(oc get ArgoCD,Rollout,RolloutManager -A -o json | jq '.items[] | " " + .metadata.namespace' -rj)
+readarray -t SUBSCRIPTIONS < <(oc get subscriptions.operators.coreos.com -A --ignore-not-found -o json | jq '.items[] | select(.metadata.name=="openshift-gitops-operator") | .spec.config.env[]?|select(.name=="ARGOCD_CLUSTER_CONFIG_NAMESPACES")| .value | split(",") | .[]' -r)
+readarray -t ARGO_CRDS < <(oc get ArgoCD,Rollout,RolloutManager -A -o json | jq '.items[] | .metadata.namespace' -r)
 oc get ns --ignore-not-found "${SUBSCRIPTIONS[@]}" "${ARGO_CRDS[@]}" openshift-gitops openshift-gitops-operator -o json \
 | jq '.items | unique |.[] | .metadata.name' -r |
 while read -r NAMESPACE; do
