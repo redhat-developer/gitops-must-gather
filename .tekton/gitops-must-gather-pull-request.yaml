@@ -203,6 +203,38 @@ spec:
         workspace: git-auth
       - name: netrc
         workspace: netrc
+    # Fetch the production Dockerfile to make sure this builds. Note it expects sources inside sources/gitops-must-gather/.
+    - name: run-script
+      params:
+      - name: ociStorage
+        value: $(params.output-image).script
+      - name: ociArtifactExpiresAfter
+        value: $(params.image-expires-after)
+      - name: SCRIPT_RUNNER_IMAGE
+        value: registry.access.redhat.com/ubi9/ubi@sha256:f405b019ad4f6ebf9097b636e83b363b1f11afe26557b7896fabff954b65a1b8
+      - name: HERMETIC
+        value: "false"
+      - name: SCRIPT
+        value: |
+          #!/bin/bash
+          set -eEuo pipefail
+          mkdir -p .konflux sources/gitops-must-gather
+          curl -fsSL -o .konflux/Containerfile.plugin \
+            https://raw.githubusercontent.com/rh-gitops-midstream/release/main/containers/must-gather/Dockerfile
+          cp gather_gitops.sh sources/gitops-must-gather/gather_gitops.sh
+      - name: SOURCE_ARTIFACT
+        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+      runAfter:
+      - prefetch-dependencies
+      taskRef:
+        params:
+        - name: name
+          value: run-script-oci-ta
+        - name: bundle
+          value: quay.io/konflux-ci/tekton-catalog/task-run-script-oci-ta:0.1@sha256:31d5bd001a5671331db1b5ef176e8c582e734cb60f724df4d73b0b230118d8c9
+        - name: kind
+          value: task
+        resolver: bundles
     - matrix:
         params:
         - name: PLATFORM
@@ -240,7 +272,10 @@ spec:
       - name: NO_PROXY
         value: $(tasks.init.results.no-proxy)
       - name: SOURCE_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+        value: $(tasks.run-script.results.SCRIPT_ARTIFACT)
+      - name: ADDITIONAL_BASE_IMAGES
+        value:
+        - $(tasks.run-script.results.SCRIPT_RUNNER_IMAGE_REFERENCE)
       - name: CACHI2_ARTIFACT
         value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
       - name: IMAGE_APPEND_PLATFORM
@@ -252,7 +287,7 @@ spec:
       - name: OMIT_HISTORY
         value: $(params.omit-history)
       runAfter:
-      - prefetch-dependencies
+      - run-script
       taskRef:
         params:
         - name: name
@@ -523,7 +558,7 @@ spec:
       - name: CONTEXT
         value: $(params.path-context)
       - name: SOURCE_ARTIFACT
-        value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+        value: $(tasks.run-script.results.SCRIPT_ARTIFACT)
       runAfter:
       - build-image-index
       taskRef:
